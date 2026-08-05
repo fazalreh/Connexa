@@ -1,0 +1,22 @@
+# Android and Gradle
+.gradle/
+**/build/
+*.iml
+.idea/
+local.properties
+
+# Secrets and service credentials
+.env
+.env.*
+*.keystore
+*.jks
+service-account*.json
+
+# Local operating-system files
+.DS_Store
+Thumbs.db
+
+# Logs and generated reports
+*.log
+coverage/
+reports/
