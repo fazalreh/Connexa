@@ -1,0 +1,294 @@
+openapi: 3.1.1
+info:
+  title: Connexa API
+  version: 0.1.0
+  description: Contract for the Connexa platform foundation.
+servers:
+  - url: http://localhost:8080
+    description: Local development service
+paths:
+  /actuator/health:
+    get:
+      operationId: getHealth
+      summary: Return process health for probes and local checks.
+      responses:
+        '200':
+          description: Service is healthy.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status:
+                    type: string
+                    example: UP
+  /api/v1/platform/status:
+    get:
+      operationId: getPlatformStatus
+      summary: Return a non-sensitive platform status response.
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Current platform status.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformStatus'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+  /api/v1/events:
+    get:
+      operationId: listEvents
+      summary: List published events using a stable pagination envelope.
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - name: q
+          in: query
+          description: Optional text query, up to 120 characters.
+          schema:
+            type: string
+            maxLength: 120
+        - name: from
+          in: query
+          description: Inclusive UTC lower time bound.
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          description: Inclusive UTC upper time bound.
+          schema:
+            type: string
+            format: date-time
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: A stable page of event summaries. The foundation returns an empty page until a persistence adapter is configured.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventPage'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+  /api/v1/events/{eventId}:
+    get:
+      operationId: getEvent
+      summary: Retrieve one event summary by opaque UUID.
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Event summary.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventSummary'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '404':
+          description: No event exists for the supplied ID.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+components:
+  parameters:
+    RequestId:
+      name: X-Request-Id
+      in: header
+      required: false
+      description: Optional caller-supplied correlation ID. Unsafe values are replaced by the service.
+      schema:
+        type: string
+        pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$'
+  headers:
+    RequestId:
+      description: Correlation ID created or preserved by the service.
+      schema:
+        type: string
+  responses:
+    InvalidRequest:
+      description: The request was syntactically valid HTTP but violated an API rule.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    PlatformStatus:
+      type: object
+      required: [service, environment, status, observedAt, requestId, disabledIntegrations]
+      properties:
+        service:
+          type: string
+          example: connexa-api
+        environment:
+          type: string
+          example: local
+        status:
+          type: string
+          enum: [available]
+        observedAt:
+          type: string
+          format: date-time
+        requestId:
+          type: string
+        disabledIntegrations:
+          type: array
+          items:
+            type: string
+          example: [firebase, ai, mail, notifications]
+    EventPage:
+      type: object
+      required: [items, page, size, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventSummary'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+          maximum: 100
+        total:
+          type: integer
+          minimum: 0
+          format: int64
+    EventSummary:
+      type: object
+      required:
+        - id
+        - title
+        - summary
+        - startsAt
+        - endsAt
+        - timeZone
+        - venueName
+        - category
+        - organizerName
+        - status
+        - revision
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          minLength: 1
+          maxLength: 160
+        summary:
+          type: string
+          minLength: 1
+          maxLength: 500
+        startsAt:
+          type: string
+          format: date-time
+          description: UTC instant.
+        endsAt:
+          type: string
+          format: date-time
+          description: UTC instant that must be after startsAt.
+        timeZone:
+          type: string
+          description: IANA time zone identifier used for display and calendar behavior.
+          example: Asia/Karachi
+        venueName:
+          type: string
+          minLength: 1
+        category:
+          type: string
+          minLength: 1
+        organizerName:
+          type: string
+          minLength: 1
+        status:
+          $ref: '#/components/schemas/EventStatus'
+        revision:
+          type: integer
+          minimum: 0
+          description: Optimistic-concurrency revision.
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    EventStatus:
+      type: string
+      enum: [DRAFT, PENDING_REVIEW, PUBLISHED, CHANGED, CANCELLED, ARCHIVED]
+    UserProfile:
+      type: object
+      required: [id, displayName, email, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          format: email
+        avatarUrl:
+          type: string
+          format: uri
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Problem:
+      type: object
+      required: [type, title, status, detail, requestId]
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri-reference
+        requestId:
+          type: string

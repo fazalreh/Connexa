@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Connexa" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/connexa_primary</item>
+        <item name="colorOnPrimary">@color/connexa_on_primary</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="ThemeOverlay.Connexa.Toolbar" parent="ThemeOverlay.Material3.Dark" />
+</resources>
