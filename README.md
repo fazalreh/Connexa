@@ -1,4 +1,4 @@
-# RallyMesh
+# Connexa
 
 > An Android-first event discovery and coordination platform for connected communities.
 
@@ -8,13 +8,13 @@
 
 ## Product vision
 
-RallyMesh will bring trusted event announcements, attendance actions, updates, reminders, and practical event guidance into one clear experience. Its purpose is to make it easier for community members to discover what is happening, understand the details, and take action without searching through scattered messages and channels.
+Connexa will bring trusted event announcements, attendance actions, updates, reminders, and practical event guidance into one clear experience. Its purpose is to make it easier for community members to discover what is happening, understand the details, and take action without searching through scattered messages and channels.
 
 ## Current focus
 
 The work begins with a deliberate foundation: defining the product boundaries, structuring the delivery plan, and preparing the technical areas that will be developed in sequence.
 
-## What RallyMesh will deliver
+## What Connexa will deliver
 
 - A searchable, filterable event feed for approved community events.
 - Secure member and organizer access.
@@ -78,7 +78,7 @@ Discovery, RSVP, calendar, and notifications
 ## Repository map
 
 ```text
-RallyMesh/
+Connexa/
 ├── android/          # Android application
 ├── services/         # APIs, business rules, and secure integrations
 ├── ingestion/        # Scheduled announcement collection and normalization
