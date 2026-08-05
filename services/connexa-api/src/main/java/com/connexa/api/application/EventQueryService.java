@@ -3,6 +3,7 @@ package com.connexa.api.application;
 import com.connexa.api.domain.event.EventNotFoundException;
 import com.connexa.api.domain.event.EventQuery;
 import com.connexa.api.domain.event.EventSummary;
+import com.connexa.api.domain.event.EventStatus;
 import com.connexa.api.domain.event.PageResponse;
 import com.connexa.api.infrastructure.event.EventCatalog;
 import java.time.Instant;
@@ -23,7 +24,11 @@ public class EventQueryService {
     }
 
     public EventSummary findEvent(UUID eventId) {
-        return eventCatalog.findById(eventId)
+        EventSummary event = eventCatalog.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(eventId));
+        if (event.status() != EventStatus.PUBLISHED) {
+            throw new EventNotFoundException(eventId);
+        }
+        return event;
     }
 }

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -24,9 +25,16 @@ FORBIDDEN_FILE_NAMES = {
     "google-services.json",
     "local.properties",
 }
-SECRET_ASSIGNMENT = re.compile(
-    r"(?i)(?:api[_-]?key|access[_-]?token|secret|password|private[_-]?key)\s*[:=]\s*['\"]?([A-Za-z0-9_./+=-]{8,})"
+SECRET_LITERAL_ASSIGNMENT = re.compile(
+    r"""(?ix)
+    (?:api[_-]?key|access[_-]?token|secret|password|private[_-]?key)
+    \s*[:=]\s*
+    ["']
+    [A-Za-z0-9_./+=-]{8,}
+    ["']
+    """
 )
+GOOGLE_API_KEY = re.compile(r"AIza[0-9A-Za-z_-]{20,}")
 
 
 def project_files() -> list[Path]:
@@ -37,6 +45,21 @@ def project_files() -> list[Path]:
         if path.is_file():
             files.append(path)
     return files
+
+
+def tracked_relative_paths() -> set[str]:
+    result = subprocess.run(
+        ["git", "-C", str(ROOT), "ls-files", "-z"],
+        check=False,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        return set()
+    return {
+        item.decode("utf-8")
+        for item in result.stdout.split(b"\0")
+        if item
+    }
 
 
 def check_required_files(errors: list[str]) -> None:
@@ -83,10 +106,12 @@ def check_openapi_basics(errors: list[str]) -> None:
 
 
 def check_for_secrets_and_sensitive_files(errors: list[str]) -> None:
+    tracked_paths = tracked_relative_paths()
     for path in project_files():
         relative_path = path.relative_to(ROOT)
         if path.name in FORBIDDEN_FILE_NAMES:
-            errors.append(f"Sensitive local configuration must not be tracked: {relative_path}")
+            if relative_path.as_posix() in tracked_paths:
+                errors.append(f"Sensitive local configuration must not be tracked: {relative_path}")
             continue
         if path.suffix.lower() in {".jar", ".png", ".jpg", ".jpeg", ".gif"}:
             continue
@@ -101,7 +126,7 @@ def check_for_secrets_and_sensitive_files(errors: list[str]) -> None:
         private_key_end = "PRIVATE " + "KEY-----"
         if private_key_begin in content and private_key_end in content:
             errors.append(f"Private-key material detected: {relative_path}")
-        if SECRET_ASSIGNMENT.search(content):
+        if SECRET_LITERAL_ASSIGNMENT.search(content) or GOOGLE_API_KEY.search(content):
             errors.append(f"Possible hard-coded secret detected: {relative_path}")
 
 

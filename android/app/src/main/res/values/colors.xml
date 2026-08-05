@@ -3,6 +3,9 @@
     <color name="connexa_primary">#183A59</color>
     <color name="connexa_on_primary">#FFFFFF</color>
     <color name="connexa_surface">#F8FAFC</color>
+    <color name="connexa_surface_container">#EAF0F5</color>
     <color name="connexa_on_surface">#17202A</color>
     <color name="connexa_on_surface_variant">#4E5A65</color>
+    <color name="connexa_outline">#71808E</color>
+    <color name="connexa_error">#B3261E</color>
 </resources>

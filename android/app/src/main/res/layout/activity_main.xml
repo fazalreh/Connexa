@@ -28,31 +28,69 @@
         app:layout_constraintTop_toBottomOf="@id/top_app_bar">
 
         <TextView
-            android:id="@+id/foundation_title"
+            android:id="@+id/home_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/foundation_title"
+            android:text="@string/home_title"
             android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
             android:textColor="@color/connexa_on_surface" />
 
         <TextView
-            android:id="@+id/foundation_description"
+            android:id="@+id/home_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:gravity="center"
-            android:text="@string/foundation_description"
+            android:text="@string/home_description"
             android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
             android:textColor="@color/connexa_on_surface_variant" />
 
-        <TextView
-            android:id="@+id/foundation_status"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/open_events_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:gravity="center"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="@color/connexa_primary" />
+            android:layout_marginTop="28dp"
+            android:text="@string/open_events" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/open_calendar_button"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/open_calendar" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/open_account_button"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/open_account" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/open_notifications_button"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/open_notifications" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/open_assistant_button"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/open_assistant" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/open_organizer_button"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/open_organizer" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

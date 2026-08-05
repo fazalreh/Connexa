@@ -22,8 +22,8 @@ public record EventSummary(
 
     public EventSummary {
         Objects.requireNonNull(id, "id is required");
-        requireText(title, "title");
-        requireText(summary, "summary");
+        requireText(title, "title", 160);
+        requireText(summary, "summary", 500);
         requireText(timeZone, "timeZone");
         requireText(venueName, "venueName");
         requireText(category, "category");
@@ -43,6 +43,13 @@ public record EventSummary(
     private static void requireText(String value, String field) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException(field + " is required");
+        }
+    }
+
+    private static void requireText(String value, String field, int maximumLength) {
+        requireText(value, field);
+        if (value.codePointCount(0, value.length()) > maximumLength) {
+            throw new IllegalArgumentException(field + " must not exceed " + maximumLength + " characters");
         }
     }
 }

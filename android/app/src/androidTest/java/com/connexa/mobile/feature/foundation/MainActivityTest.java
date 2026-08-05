@@ -2,7 +2,7 @@ package com.connexa.mobile.feature.foundation;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.containsString;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
@@ -16,10 +16,10 @@ import org.junit.runner.RunWith;
 public class MainActivityTest {
 
     @Test
-    public void displaysTheFoundationStatus() {
+    public void displaysTheHomeActions() {
         try (ActivityScenario<MainActivity> ignored = ActivityScenario.launch(MainActivity.class)) {
-            onView(withId(R.id.foundation_title)).check(matches(withText(R.string.foundation_title)));
-            onView(withId(R.id.foundation_status)).check(matches(withText(containsString("Foundation ready"))));
+            onView(withId(R.id.home_title)).check(matches(withText(R.string.home_title)));
+            onView(withId(R.id.open_events_button)).check(matches(isDisplayed()));
         }
     }
 }
