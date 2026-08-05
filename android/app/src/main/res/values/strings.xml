@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Connexa</string>
+    <string name="foundation_title">Connexa foundation</string>
+    <string name="foundation_description">The application shell and service contract are ready for the next delivery milestone.</string>
+</resources>

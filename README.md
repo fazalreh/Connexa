@@ -1,92 +1,98 @@
 # Connexa
 
-> An Android-first event discovery and coordination platform for connected communities.
+Connexa is an Android-first event discovery and coordination platform for connected communities. It will consolidate trusted event announcements, attendance actions, updates, reminders, and practical event guidance into one clear member experience.
 
 **Arbisoft Internship Final Project**  
 **Prepared by:** Fazal Rehman  
 **Mentored by:** Waleed Khalid
 
-## Product vision
+## Milestone 1: foundation
 
-Connexa will bring trusted event announcements, attendance actions, updates, reminders, and practical event guidance into one clear experience. Its purpose is to make it easier for community members to discover what is happening, understand the details, and take action without searching through scattered messages and channels.
+This milestone establishes the technical baseline on which later features will be built. It contains no live third-party accounts, API keys, or service credentials.
 
-## Current focus
+- Native Java Android application shell with a verified empty/loading foundation state.
+- Java 17 Spring Boot API with health, status, request IDs, structured errors, and an empty event catalog boundary.
+- OpenAPI 3.1 contract for the initial public API surface.
+- Event and user contracts with validation rules for time, status, pagination, and versioning.
+- Empty environment templates and integration boundaries for Firebase, AI, mail, and notifications.
+- Unit tests, API tests, an Android smoke test, static repository checks, and continuous-integration workflow definitions.
 
-The work begins with a deliberate foundation: defining the product boundaries, structuring the delivery plan, and preparing the technical areas that will be developed in sequence.
+## Technology decisions
 
-## What Connexa will deliver
-
-- A searchable, filterable event feed for approved community events.
-- Secure member and organizer access.
-- Event creation, editing, publishing, cancellation, and visibility controls.
-- Attendance registration, saved events, calendar views, and reminders.
-- Trusted announcement ingestion from approved sources on a regular schedule.
-- AI-assisted extraction of event details, with validation before publication.
-- A grounded event assistant that answers from approved event records.
-- Timely notifications when an event changes, is cancelled, or is approaching.
-
-## Planned architecture
-
-| Layer | Planned technology | Purpose |
+| Area | Decision | Reason |
 | --- | --- | --- |
-| Mobile experience | Java 11, Android SDK, XML layouts, AndroidX, Material Design | Native Android experience for members and organizers. |
-| Application services | Java with Spring Boot or Java-based cloud functions | Secure APIs, business rules, validation, and scheduled work. |
-| Identity and event data | Firebase Authentication and Cloud Firestore | Managed sign-in, real-time event data, and access controls. |
-| Media | Firebase Storage | Event posters and supporting media. |
-| Announcement ingestion | Java worker with Gmail API or IMAP | Retrieves approved announcements on a controlled schedule. |
-| AI services | Gemini API through the backend | Extracts structured event details and supports grounded assistance. |
-| Notifications | Firebase Cloud Messaging | Delivers reminders, updates, and cancellation notices. |
-| Quality assurance | JUnit, Mockito, Espresso, Firebase Emulator Suite | Validates business logic, interface behavior, and integrations. |
+| Android | Java 17, Android SDK, XML layouts, AndroidX, Material Components | Native, accessible Android experience with a focused Java codebase. |
+| API | Java 17, Spring Boot 4.1, Spring MVC, Validation, Actuator | Production-grade HTTP services, externalized configuration, health checks, and test support. |
+| Contract | OpenAPI 3.1 | Makes the client/server agreement explicit before feature work grows. |
+| Integration boundary | Interfaces and local-safe implementations | Keeps credentials and vendor-specific calls out of Android and core business logic. |
+| Quality | JUnit, MockMvc, Espresso, Gradle Wrapper, CI | Provides repeatable checks without relying on private accounts. |
 
-## Delivery path
-
-1. **Foundation** — establish repository structure, product rules, data model, and environment configuration.
-2. **Core experience** — build authentication, member profiles, event browsing, search, filters, and event details.
-3. **Organizer operations** — add event creation, media uploads, editing, publishing, attendance limits, and cancellation controls.
-4. **Trusted ingestion** — connect approved announcement sources, create candidate events, and validate extracted details.
-5. **Engagement** — deliver registration, saved events, calendar support, notifications, and reminders.
-6. **Event intelligence** — add validated summaries and a grounded assistant using approved event records only.
-7. **Quality and release readiness** — complete automated tests, security review, accessibility checks, performance testing, and release preparation.
-
-## Core workflow
-
-```text
-Approved announcement source
-        ↓
-Scheduled Java ingestion worker
-        ↓
-Candidate event record
-        ↓
-AI-assisted structured extraction
-        ↓
-Rules, validation, and review
-        ↓
-Published event
-        ↓
-Discovery, RSVP, calendar, and notifications
-```
-
-## Working principles
-
-- Credentials, administrative actions, and AI access remain on secure server-side services.
-- Only approved sources can create ingestion candidates.
-- An event is not published until required fields and validation rules are satisfied.
-- Updates and cancellations produce traceable changes and timely member notifications.
-- The assistant uses approved event records as its source of truth.
-- Quality is verified continuously through automated and scenario-based testing.
-
-## Repository map
+## Repository layout
 
 ```text
 Connexa/
-├── android/          # Android application
-├── services/         # APIs, business rules, and secure integrations
-├── ingestion/        # Scheduled announcement collection and normalization
-├── infrastructure/   # Environment, deployment, and service configuration
-├── tests/            # Automated test assets
-└── docs/             # Architecture, workflows, and delivery documentation
+|-- android/                     Native Android application
+|-- services/connexa-api/        Spring Boot API
+|-- contracts/openapi/           Versioned API contract
+|-- contracts/examples/          Example event and user payloads
+|-- docs/                        Architecture decisions and runbooks
+|-- infrastructure/              Local integration guidance
+|-- scripts/                     Repository verification scripts
+`-- .github/workflows/           Continuous integration
 ```
 
-## First milestone
+## Local prerequisites
 
-Create the initial Android and service modules, define the event and user data contracts, configure secure environment handling, and establish the baseline test suite.
+Install the following before building locally:
+
+- JDK 17
+- Android Studio with Android SDK Platform 37 and Build Tools 36.0.0
+- An Android emulator or physical device for instrumented tests
+
+No Firebase, AI, mail, or notification account is required for Milestone 1.
+
+## Run the checks
+
+From PowerShell:
+
+```powershell
+python scripts/verify_foundation.py
+
+Set-Location services/connexa-api
+.\gradlew.bat test
+
+Set-Location ../../android
+.\gradlew.bat :app:testDebugUnitTest :app:lintDebug
+```
+
+To run the Android instrumented smoke test, start an emulator and run:
+
+```powershell
+.\gradlew.bat :app:connectedDebugAndroidTest
+```
+
+## Configuration and credentials
+
+The configuration templates intentionally contain blank values. Use `services/connexa-api/.env.example` as a reference when an integration is ready, then provide real values through your local environment or deployment secret manager. The foundation does not load a `.env` file automatically.
+
+Do not commit `.env` files, service-account files, keystores, private tokens, or production endpoints. Connexa keeps all privileged integration work on the server side.
+
+## Current API surface
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/actuator/health` | Process health for local checks and deployment probes. |
+| `GET` | `/api/v1/platform/status` | Non-sensitive service status with request ID. |
+| `GET` | `/api/v1/events` | Contract-first empty event collection with pagination. |
+| `GET` | `/api/v1/events/{eventId}` | Event lookup boundary; unknown IDs return a standard problem response. |
+
+The complete schema is maintained in [contracts/openapi/connexa-v1.yaml](contracts/openapi/connexa-v1.yaml).
+
+## Engineering rules
+
+- Treat the OpenAPI contract as the public interface source of truth.
+- Store all timestamps in UTC and preserve each event's IANA time zone.
+- Use opaque UUID identifiers and optimistic revision numbers.
+- Generate a request ID for every API response and preserve it in logs.
+- Validate event data before any later publishing or notification workflow.
+- Keep unavailable integrations disabled rather than replacing them with hard-coded credentials.

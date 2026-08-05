@@ -4,13 +4,23 @@
 *.iml
 .idea/
 local.properties
+.android/
+
+# Local tool and test state
+.mvn/
+.pytest_cache/
+__pycache__/
+*.py[cod]
 
 # Secrets and service credentials
 .env
 .env.*
+!.env.example
 *.keystore
 *.jks
 service-account*.json
+google-services.json
+firebase-adminsdk-*.json
 
 # Local operating-system files
 .DS_Store
@@ -20,3 +30,4 @@ Thumbs.db
 *.log
 coverage/
 reports/
+.DS_Store
