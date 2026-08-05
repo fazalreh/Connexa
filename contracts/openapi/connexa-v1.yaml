@@ -2,7 +2,10 @@ openapi: 3.1.1
 info:
   title: Connexa API
   version: 0.1.0
-  description: Contract for the Connexa platform foundation.
+  description: |
+    Contract for the Connexa platform. Public event discovery is available without
+    a credential. Identity-scoped operations use a bearer credential that must be
+    verified by a trusted server-side identity adapter.
 servers:
   - url: http://localhost:8080
     description: Local development service
@@ -115,15 +118,333 @@ paths:
         '400':
           $ref: '#/components/responses/InvalidRequest'
         '404':
-          description: No event exists for the supplied ID.
+          $ref: '#/components/responses/EventNotFound'
+  /api/v1/me:
+    get:
+      operationId: getCurrentIdentity
+      summary: Retrieve the verified identity for the current bearer credential.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Verified identity and the server-recognized roles for the caller.
           headers:
             X-Request-Id:
               $ref: '#/components/headers/RequestId'
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: '#/components/schemas/CurrentIdentity'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+  /api/v1/me/attendance:
+    get:
+      operationId: listMyAttendance
+      summary: List the caller's saved-event and RSVP state.
+      description: Returns only attendance records that currently have saved or RSVP state.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: A stable page of identity-scoped attendance state.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendancePage'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+  /api/v1/events/{eventId}/attendance:
+    get:
+      operationId: getEventAttendance
+      summary: Retrieve the caller's saved-event and RSVP state for one event.
+      description: 'An event with no saved or RSVP state returns `saved: false` and null RSVP and update fields.'
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/EventId'
+      responses:
+        '200':
+          description: Attendance state for the caller and event.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendanceState'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '404':
+          $ref: '#/components/responses/EventNotFound'
+  /api/v1/events/{eventId}/saved:
+    put:
+      operationId: saveEvent
+      summary: Mark an event as saved for the current caller.
+      description: This operation is idempotent; repeating it keeps the event saved.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/EventId'
+      responses:
+        '200':
+          description: Updated saved-event and RSVP state.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendanceState'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '404':
+          $ref: '#/components/responses/EventNotFound'
+    delete:
+      operationId: unsaveEvent
+      summary: Remove the saved marker for an event.
+      description: This operation is idempotent; an existing RSVP is retained.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/EventId'
+      responses:
+        '200':
+          description: Updated saved-event and RSVP state.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendanceState'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '404':
+          $ref: '#/components/responses/EventNotFound'
+  /api/v1/events/{eventId}/rsvp:
+    put:
+      operationId: setEventRsvp
+      summary: Set the caller's RSVP status for an event.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/EventId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RsvpUpdateRequest'
+      responses:
+        '200':
+          description: Updated saved-event and RSVP state.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendanceState'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '404':
+          $ref: '#/components/responses/EventNotFound'
+    delete:
+      operationId: clearEventRsvp
+      summary: Clear the caller's RSVP status for an event.
+      description: This operation is idempotent; an existing saved marker is retained.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/EventId'
+      responses:
+        '200':
+          description: Updated saved-event and RSVP state.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendanceState'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '404':
+          $ref: '#/components/responses/EventNotFound'
+  /api/v1/organizer/events:
+    get:
+      operationId: listOrganizerEventDrafts
+      summary: List private event drafts owned by the current organizer.
+      description: Requires a verified identity with the `ORGANIZER` role. Drafts are not public event-discovery records.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: A stable page of private drafts owned by the caller.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizerEventDraftPage'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '403':
+          $ref: '#/components/responses/OrganizerPermissionRequired'
+    post:
+      operationId: createOrganizerEventDraft
+      summary: Create a private event draft for the current organizer.
+      description: Requires a verified identity with the `ORGANIZER` role. The created record starts in `DRAFT` status and is not public.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizerEventCreateRequest'
+      responses:
+        '201':
+          description: Private event draft created.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizerEventDraft'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '403':
+          $ref: '#/components/responses/OrganizerPermissionRequired'
+  /api/v1/assistant/messages:
+    post:
+      operationId: sendAssistantMessage
+      summary: Send a context-aware message to the server-side event assistant.
+      description: The assistant provider remains behind the service boundary; callers never send a provider credential.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssistantMessageRequest'
+      responses:
+        '200':
+          description: Assistant reply, including optional event references.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssistantReply'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '503':
+          $ref: '#/components/responses/AssistantUnavailable'
+  /api/v1/notifications:
+    get:
+      operationId: listNotifications
+      summary: List the current caller's notification inbox.
+      description: Inbox items are identity-scoped and sorted by the configured notification store.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: A stable page of notifications for the current caller.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPage'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+  /api/v1/notifications/{notificationId}/read:
+    put:
+      operationId: markNotificationRead
+      summary: Mark a notification as read for the current caller.
+      description: The operation is idempotent; an already-read notification remains read.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/NotificationId'
+      responses:
+        '200':
+          description: Updated notification read state.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '404':
+          $ref: '#/components/responses/NotificationNotFound'
 components:
+  securitySchemes:
+    ConnexaBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        A bearer credential verified by the Connexa server-side identity boundary.
+        Clients must not use a caller-supplied identity header as a substitute.
   parameters:
     RequestId:
       name: X-Request-Id
@@ -133,14 +454,102 @@ components:
       schema:
         type: string
         pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$'
+    EventId:
+      name: eventId
+      in: path
+      required: true
+      description: Opaque event identifier.
+      schema:
+        type: string
+        format: uuid
+    NotificationId:
+      name: notificationId
+      in: path
+      required: true
+      description: Opaque notification identifier.
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      description: Zero-based page number.
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    PageSize:
+      name: size
+      in: query
+      description: Maximum number of records in one page.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
   headers:
     RequestId:
       description: Correlation ID created or preserved by the service.
       schema:
         type: string
+    BearerChallenge:
+      description: Indicates that the caller must present a bearer credential.
+      schema:
+        type: string
+        example: Bearer
   responses:
     InvalidRequest:
       description: The request was syntactically valid HTTP but violated an API rule.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    AuthenticationRequired:
+      description: A verified bearer credential is required for this identity-scoped operation.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+        WWW-Authenticate:
+          $ref: '#/components/headers/BearerChallenge'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    OrganizerPermissionRequired:
+      description: The verified identity does not have the ORGANIZER role required by this operation.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    AssistantUnavailable:
+      description: The server-side assistant provider is not currently available.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    EventNotFound:
+      description: No event exists for the supplied ID.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotificationNotFound:
+      description: No notification exists for the supplied ID in the caller's inbox.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
       content:
         application/problem+json:
           schema:
@@ -292,3 +701,291 @@ components:
           format: uri-reference
         requestId:
           type: string
+    CurrentIdentity:
+      type: object
+      required: [subject, roles]
+      description: Safe identity claims derived only after server-side credential verification.
+      properties:
+        subject:
+          type: string
+          minLength: 1
+          description: Stable, provider-scoped subject identifier.
+        displayName:
+          type: [string, 'null']
+          minLength: 1
+          description: Display name when supplied by the verified identity provider.
+        email:
+          type: [string, 'null']
+          format: email
+          description: Email address when supplied by the verified identity provider.
+        roles:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/IdentityRole'
+    IdentityRole:
+      type: string
+      description: A role asserted by the trusted identity provider, not by request input.
+      enum: [ATTENDEE, ORGANIZER, MODERATOR]
+    AttendancePage:
+      type: object
+      required: [items, page, size, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttendanceState'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+          maximum: 100
+        total:
+          type: integer
+          format: int64
+          minimum: 0
+    AttendanceState:
+      type: object
+      required: [eventId, saved, rsvpStatus, updatedAt]
+      description: The current caller's private saved-event and RSVP state for one event.
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        saved:
+          type: boolean
+        rsvpStatus:
+          type: [string, 'null']
+          enum: [GOING, INTERESTED, DECLINED, null]
+          description: Null when the caller has not set an RSVP.
+        updatedAt:
+          type: [string, 'null']
+          format: date-time
+          description: Null when neither a saved marker nor an RSVP exists.
+    RsvpUpdateRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: '#/components/schemas/RsvpStatus'
+    RsvpStatus:
+      type: string
+      enum: [GOING, INTERESTED, DECLINED]
+    OrganizerEventCreateRequest:
+      type: object
+      required: [title, description, location, startsAt, endsAt, timeZone, category, capacity]
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 120
+        description:
+          type: string
+          minLength: 20
+          maxLength: 5000
+        location:
+          type: string
+          minLength: 2
+          maxLength: 160
+        startsAt:
+          type: string
+          format: date-time
+          description: UTC instant at which the event begins.
+        endsAt:
+          type: string
+          format: date-time
+          description: UTC instant after `startsAt` at which the event ends.
+        timeZone:
+          type: string
+          minLength: 1
+          maxLength: 64
+          description: IANA time zone identifier used for event display and validation.
+          example: Asia/Karachi
+        category:
+          type: string
+          minLength: 2
+          maxLength: 80
+        capacity:
+          type: integer
+          minimum: 1
+          maximum: 100000
+    OrganizerEventDraftPage:
+      type: object
+      required: [items, page, size, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizerEventDraft'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+          maximum: 100
+        total:
+          type: integer
+          format: int64
+          minimum: 0
+    OrganizerEventDraft:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - location
+        - startsAt
+        - endsAt
+        - timeZone
+        - category
+        - capacity
+        - status
+        - createdAt
+        - updatedAt
+      description: Private organizer-owned event draft; it is not part of public event discovery.
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          minLength: 3
+          maxLength: 120
+        description:
+          type: string
+          minLength: 20
+          maxLength: 5000
+        location:
+          type: string
+          minLength: 2
+          maxLength: 160
+        startsAt:
+          type: string
+          format: date-time
+        endsAt:
+          type: string
+          format: date-time
+        timeZone:
+          type: string
+          minLength: 1
+          maxLength: 64
+        category:
+          type: string
+          minLength: 2
+          maxLength: 80
+        capacity:
+          type: integer
+          minimum: 1
+          maximum: 100000
+        status:
+          type: string
+          const: DRAFT
+          description: Organizer-create operations produce private drafts only.
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    AssistantMessageRequest:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          description: Non-blank user message for the event assistant.
+        conversationId:
+          type: [string, 'null']
+          format: uuid
+          description: Optional existing conversation identifier; omit to begin a new conversation.
+        eventId:
+          type: [string, 'null']
+          format: uuid
+          description: Optional event context for the assistant request.
+    AssistantReply:
+      type: object
+      required: [conversationId, message, references, createdAt]
+      properties:
+        conversationId:
+          type: string
+          format: uuid
+        message:
+          type: string
+          minLength: 1
+          maxLength: 4000
+        references:
+          type: array
+          description: Event references selected by the server-side assistant.
+          items:
+            $ref: '#/components/schemas/AssistantReference'
+        createdAt:
+          type: string
+          format: date-time
+    AssistantReference:
+      type: object
+      required: [eventId, label]
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        label:
+          type: string
+          minLength: 1
+          maxLength: 160
+    NotificationPage:
+      type: object
+      required: [items, page, size, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+          maximum: 100
+        total:
+          type: integer
+          format: int64
+          minimum: 0
+    Notification:
+      type: object
+      required: [id, type, title, body, eventId, createdAt, read, readAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/NotificationType'
+        title:
+          type: string
+          minLength: 1
+          maxLength: 160
+        body:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        eventId:
+          type: [string, 'null']
+          format: uuid
+          description: Related event identifier when the inbox item is event-specific.
+        createdAt:
+          type: string
+          format: date-time
+        read:
+          type: boolean
+        readAt:
+          type: [string, 'null']
+          format: date-time
+          description: Null until the caller marks the notification read.
+    NotificationType:
+      type: string
+      enum: [EVENT_PUBLISHED, EVENT_UPDATED, RSVP_CONFIRMED, EVENT_REMINDER, SYSTEM]

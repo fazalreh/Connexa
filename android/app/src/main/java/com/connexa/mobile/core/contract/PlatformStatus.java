@@ -27,7 +27,7 @@ public final class PlatformStatus {
     }
 
     private static String requireText(String value, String field) {
-        if (value == null || value.isBlank()) {
+        if (value == null || value.trim().isEmpty()) {
             throw new IllegalArgumentException(field + " is required");
         }
         return value;

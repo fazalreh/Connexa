@@ -2,20 +2,25 @@
 
 Connexa is an Android-first event discovery and coordination platform for connected communities. It will consolidate trusted event announcements, attendance actions, updates, reminders, and practical event guidance into one clear member experience.
 
-**Arbisoft Internship Final Project**  
-**Prepared by:** Fazal Rehman  
-**Mentored by:** Waleed Khalid
+**Arbisoft Internship &middot; Fazal Rehman &middot; Mentored by Waleed Khalid**
 
-## Milestone 1: foundation
+## Product scope
 
-This milestone establishes the technical baseline on which later features will be built. It contains no live third-party accounts, API keys, or service credentials.
+Connexa brings trusted event discovery and coordination into one member experience:
 
-- Native Java Android application shell with a verified empty/loading foundation state.
-- Java 17 Spring Boot API with health, status, request IDs, structured errors, and an empty event catalog boundary.
-- OpenAPI 3.1 contract for the initial public API surface.
-- Event and user contracts with validation rules for time, status, pagination, and versioning.
-- Empty environment templates and integration boundaries for Firebase, AI, mail, and notifications.
-- Unit tests, API tests, an Android smoke test, static repository checks, and continuous-integration workflow definitions.
+- Account access for attendees and organizers.
+- Event discovery, search, details, calendar views, attendance actions, updates, and reminders.
+- Organizer event creation, media, event management, and attendance analytics.
+- A server-side event assistant and trusted announcement ingestion workflow.
+
+## Current implementation
+
+The repository provides a Java 17 Android and Spring Boot baseline with a contract-first API. Android feature modules cover event discovery and details, calendar presentation, account-form validation, attendance controls, assistant conversation, organizer draft preparation, and notification presentation. Protected server routes define the identity-scoped attendance, organizer, assistant, and notification workflows. All privileged integrations remain disabled until their Connexa configuration is supplied.
+
+- Native Android application with XML layouts, Material Components, ViewBinding, and feature-isolated Java packages.
+- Java 17 Spring Boot API with health, status, request IDs, structured errors, and a versioned event catalog boundary.
+- OpenAPI 3.1 contract, event/user validation rules, and environment templates with empty values.
+- Unit tests, API tests, Android smoke coverage, static repository checks, and continuous-integration workflow definitions.
 
 ## Technology decisions
 
@@ -49,7 +54,7 @@ Install the following before building locally:
 - Android Studio with Android SDK Platform 37 and Build Tools 36.0.0
 - An Android emulator or physical device for instrumented tests
 
-No Firebase, AI, mail, or notification account is required for Milestone 1.
+No Firebase, AI, mail, or notification account is required to build the baseline. Those capabilities are activated only through the Connexa configuration path when their new service settings are available.
 
 ## Run the checks
 
@@ -63,6 +68,10 @@ Set-Location services/connexa-api
 
 Set-Location ../../android
 .\gradlew.bat :app:testDebugUnitTest :app:lintDebug
+
+Set-Location ..
+$env:PYTHONPATH = "$PWD\ingestion"
+python -m unittest discover -s ingestion/connexa_ingestion/tests -v
 ```
 
 To run the Android instrumented smoke test, start an emulator and run:
@@ -73,7 +82,7 @@ To run the Android instrumented smoke test, start an emulator and run:
 
 ## Configuration and credentials
 
-The configuration templates intentionally contain blank values. Use `services/connexa-api/.env.example` as a reference when an integration is ready, then provide real values through your local environment or deployment secret manager. The foundation does not load a `.env` file automatically.
+The configuration templates intentionally contain blank values. Use `services/connexa-api/.env.example` as a reference when an integration is ready, then provide real values through your local environment or deployment secret manager. The foundation does not load a `.env` file automatically. The API defaults to rejecting identity requests, disabling the assistant gateway, and using in-memory stores; switch a mode only when its replacement server-side adapter and fresh configuration are both ready.
 
 Do not commit `.env` files, service-account files, keystores, private tokens, or production endpoints. Connexa keeps all privileged integration work on the server side.
 
@@ -85,8 +94,17 @@ Do not commit `.env` files, service-account files, keystores, private tokens, or
 | `GET` | `/api/v1/platform/status` | Non-sensitive service status with request ID. |
 | `GET` | `/api/v1/events` | Contract-first empty event collection with pagination. |
 | `GET` | `/api/v1/events/{eventId}` | Event lookup boundary; unknown IDs return a standard problem response. |
+| `GET` | `/api/v1/me` | Verified identity and server-recognized roles for the current caller. |
+| `GET` | `/api/v1/me/attendance` | The caller's saved-event and RSVP state. |
+| `GET` | `/api/v1/events/{eventId}/attendance` | Attendance state for one event and the current caller. |
+| `PUT` / `DELETE` | `/api/v1/events/{eventId}/saved` | Save or remove a saved-event marker. |
+| `PUT` / `DELETE` | `/api/v1/events/{eventId}/rsvp` | Set or clear an RSVP. |
+| `GET` / `POST` | `/api/v1/organizer/events` | List or create private organizer event drafts. |
+| `POST` | `/api/v1/assistant/messages` | Server-side event-assistant message boundary. |
+| `GET` | `/api/v1/notifications` | Identity-scoped notification inbox. |
+| `PUT` | `/api/v1/notifications/{notificationId}/read` | Mark a notification as read. |
 
-The complete schema is maintained in [contracts/openapi/connexa-v1.yaml](contracts/openapi/connexa-v1.yaml).
+All identity-scoped endpoints use the documented bearer-authentication scheme. The complete schema, including shared problem responses and request/response validation rules, is maintained in [contracts/openapi/connexa-v1.yaml](contracts/openapi/connexa-v1.yaml).
 
 ## Engineering rules
 

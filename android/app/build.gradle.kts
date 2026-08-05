@@ -1,10 +1,38 @@
+import java.net.URI
+
 plugins {
     id("com.android.application")
 }
 
-val apiBaseUrl = providers.gradleProperty("CONNEXA_API_BASE_URL")
+val debugApiBaseUrl = providers.gradleProperty("CONNEXA_API_BASE_URL")
     .orElse("http://10.0.2.2:8080/")
     .get()
+val releaseApiBaseUrl = providers.gradleProperty("CONNEXA_RELEASE_API_BASE_URL")
+    .orElse("https://api.connexa.invalid/")
+    .get()
+
+fun validateApiBaseUrl(name: String, value: String, httpsOnly: Boolean) {
+    val uri = try {
+        URI(value)
+    } catch (exception: Exception) {
+        throw GradleException("$name must be an absolute HTTP(S) URL.", exception)
+    }
+    val allowed = if (httpsOnly) uri.scheme == "https" else uri.scheme == "http" || uri.scheme == "https"
+    check(uri.host != null && allowed) {
+        if (httpsOnly) {
+            "$name must be an absolute HTTPS URL."
+        } else {
+            "$name must be an absolute HTTP(S) URL."
+        }
+    }
+}
+
+fun buildConfigString(value: String): String {
+    return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+}
+
+validateApiBaseUrl("CONNEXA_API_BASE_URL", debugApiBaseUrl, false)
+validateApiBaseUrl("CONNEXA_RELEASE_API_BASE_URL", releaseApiBaseUrl, true)
 
 android {
     namespace = "com.connexa.mobile"
@@ -18,7 +46,6 @@ android {
         versionName = "0.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
     }
 
     buildFeatures {
@@ -27,8 +54,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "API_BASE_URL", buildConfigString(debugApiBaseUrl))
+        }
         release {
             isMinifyEnabled = true
+            buildConfigField("String", "API_BASE_URL", buildConfigString(releaseApiBaseUrl))
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -50,6 +81,7 @@ android {
 dependencies {
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
     implementation("com.google.android.material:material:1.13.0")
 
     testImplementation("junit:junit:4.13.2")

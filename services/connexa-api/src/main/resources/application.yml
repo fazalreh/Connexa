@@ -28,6 +28,12 @@ info:
 connexa:
   service-name: connexa-api
   environment: ${CONNEXA_ENVIRONMENT:local}
+  identity:
+    mode: ${CONNEXA_IDENTITY_MODE:rejecting}
+  assistant:
+    mode: ${CONNEXA_ASSISTANT_MODE:disabled}
+  persistence:
+    mode: ${CONNEXA_PERSISTENCE_MODE:in-memory}
   integrations:
     firebase-enabled: false
     ai-enabled: false

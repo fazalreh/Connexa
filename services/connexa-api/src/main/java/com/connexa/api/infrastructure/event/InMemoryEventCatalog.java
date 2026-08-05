@@ -5,6 +5,7 @@ import com.connexa.api.domain.event.EventSummary;
 import com.connexa.api.domain.event.PageResponse;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -12,6 +13,10 @@ import org.springframework.stereotype.Repository;
  * It deliberately contains no production data and never contacts external services.
  */
 @Repository
+@ConditionalOnProperty(
+        name = "connexa.persistence.mode",
+        havingValue = "in-memory",
+        matchIfMissing = true)
 public class InMemoryEventCatalog implements EventCatalog {
 
     @Override

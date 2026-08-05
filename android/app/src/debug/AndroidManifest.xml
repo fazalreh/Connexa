@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Development HTTP is limited to the Android emulator host by this debug-only policy. -->
+    <application android:networkSecurityConfig="@xml/debug_network_security_config" />
+
+</manifest>

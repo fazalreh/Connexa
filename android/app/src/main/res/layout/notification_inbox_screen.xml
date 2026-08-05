@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/connexa_surface">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/notification_toolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/connexa_primary"
+        android:navigationContentDescription="@string/go_back"
+        android:theme="@style/ThemeOverlay.Connexa.Toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@android:drawable/ic_media_previous"
+        app:title="@string/notifications_title" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/notification_list"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/notification_toolbar" />
+
+    <LinearLayout
+        android:id="@+id/notification_loading_state"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="24dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/notification_list"
+        app:layout_constraintEnd_toEndOf="@id/notification_list"
+        app:layout_constraintStart_toStartOf="@id/notification_list"
+        app:layout_constraintTop_toTopOf="@id/notification_list">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:indeterminate="true" />
+
+        <TextView
+            android:id="@+id/notification_loading_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/notifications_loading"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="@color/connexa_on_surface_variant" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/notification_empty_state"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/notification_list"
+        app:layout_constraintEnd_toEndOf="@id/notification_list"
+        app:layout_constraintStart_toStartOf="@id/notification_list"
+        app:layout_constraintTop_toTopOf="@id/notification_list">
+
+        <TextView
+            android:id="@+id/notification_empty_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/notifications_empty_title"
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="@color/connexa_on_surface" />
+
+        <TextView
+            android:id="@+id/notification_empty_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/notifications_empty_description"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="@color/connexa_on_surface_variant" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/notification_error_state"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/notification_list"
+        app:layout_constraintEnd_toEndOf="@id/notification_list"
+        app:layout_constraintStart_toStartOf="@id/notification_list"
+        app:layout_constraintTop_toTopOf="@id/notification_list">
+
+        <TextView
+            android:id="@+id/notification_error_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="@color/connexa_error" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/notification_retry_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/notifications_retry" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
