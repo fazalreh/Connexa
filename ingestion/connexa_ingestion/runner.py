@@ -55,9 +55,10 @@ class RunnerSettings:
             api_base_url=required("CONNEXA_API_BASE_URL"),
             api_token=required("CONNEXA_INGESTION_API_TOKEN"),
             ai_api_key=required("CONNEXA_AI_API_KEY"),
-            ai_model=(env.get("CONNEXA_AI_EMBEDDING_MODEL") or "").strip()
-            or (env.get("CONNEXA_AI_MODEL") or "").strip()
-            or "gemini-2.5-flash",
+            # The extractor generates text, so only the text model belongs here. Reading the
+            # embedding variable would hand it a model that has no generateContent endpoint,
+            # and the run would fail against the provider rather than in configuration.
+            ai_model=(env.get("CONNEXA_AI_MODEL") or "").strip() or "gemini-2.5-flash",
             mail_host=(env.get("CONNEXA_MAIL_HOST") or "imap.gmail.com").strip(),
             mail_port=int((env.get("CONNEXA_MAIL_PORT") or "993").strip()),
             mail_folder=(env.get("CONNEXA_MAIL_FOLDER") or "INBOX").strip(),

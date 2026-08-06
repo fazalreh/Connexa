@@ -176,6 +176,23 @@ class RunnerSettingsTests(unittest.TestCase):
         self.assertEqual(993, settings.mail_port)
         self.assertEqual("INBOX", settings.mail_folder)
 
+    def test_the_embedding_model_is_never_used_for_extraction(self):
+        """Extraction generates text; an embedding model has no generateContent endpoint.
+
+        Both variables are normally set together in a deployed environment, so reading the
+        wrong one fails at the provider rather than in configuration, which is a much more
+        confusing place to discover it.
+        """
+        settings = RunnerSettings.from_environment({
+            "CONNEXA_API_BASE_URL": "http://localhost:8080/",
+            "CONNEXA_INGESTION_API_TOKEN": "token",
+            "CONNEXA_AI_API_KEY": "key",
+            "CONNEXA_AI_MODEL": "gemini-3.6-flash",
+            "CONNEXA_AI_EMBEDDING_MODEL": "gemini-embedding-001",
+        })
+
+        self.assertEqual("gemini-3.6-flash", settings.ai_model)
+
 
 if __name__ == "__main__":
     unittest.main()
