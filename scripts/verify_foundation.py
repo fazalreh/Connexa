@@ -117,6 +117,12 @@ def check_for_secrets_and_sensitive_files(errors: list[str]) -> None:
             continue
         if path.name == ".env.example":
             continue
+        if relative_path.as_posix() not in tracked_paths:
+            # Only tracked content can leak. Local credential files are gitignored and
+            # belong on a developer's disk; flagging them would make this check cry wolf
+            # on every machine that is correctly configured, which is how a real finding
+            # ends up ignored.
+            continue
         try:
             content = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:

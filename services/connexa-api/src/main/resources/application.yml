@@ -1,11 +1,35 @@
 spring:
   application:
     name: connexa-api
+  # Loads local configuration when present so values need not be exported by hand.
+  # The file is gitignored and optional, so a deployment can supply the same names
+  # through its own environment or secret manager instead.
+  #
+  # CONNEXA_LOCAL_ENV lets a caller point this elsewhere. The test task sets it to a
+  # path that does not exist, which is what stops a test run from inheriting real
+  # credentials and reaching a production database.
+  config:
+    import: optional:file:${CONNEXA_LOCAL_ENV:./.env.local}[.properties]
   lifecycle:
     timeout-per-shutdown-phase: 20s
   mvc:
     problemdetails:
       enabled: true
+  # The connection pool is created lazily and is only ever used when
+  # connexa.persistence.mode=postgres selects the JDBC adapters. In the default
+  # in-memory mode nothing resolves a connection, so no database is required to run.
+  datasource:
+    url: ${CONNEXA_DB_URL:jdbc:postgresql://localhost:5432/connexa}
+    username: ${CONNEXA_DB_USERNAME:connexa}
+    password: ${CONNEXA_DB_PASSWORD:}
+    hikari:
+      pool-name: connexa-pool
+      maximum-pool-size: ${CONNEXA_DB_POOL_MAX:10}
+  # Migrations stay off until a real database is configured, so the default profile
+  # never attempts to connect on startup.
+  flyway:
+    enabled: ${CONNEXA_DB_MIGRATE:false}
+    locations: classpath:db/migration
 
 server:
   shutdown: graceful
@@ -19,6 +43,11 @@ management:
     health:
       probes:
         enabled: true
+  health:
+    # Probing the database would force a connection attempt, which must not happen
+    # while the service is running on the default in-memory adapters.
+    db:
+      enabled: ${CONNEXA_DB_HEALTH:false}
 
 info:
   app:
@@ -30,8 +59,45 @@ connexa:
   environment: ${CONNEXA_ENVIRONMENT:local}
   identity:
     mode: ${CONNEXA_IDENTITY_MODE:rejecting}
+    firebase:
+      project-id: ${CONNEXA_FIREBASE_PROJECT_ID:}
+      service-account-path: ${CONNEXA_FIREBASE_SERVICE_ACCOUNT_JSON:}
+      # Emails granted ORGANIZER. Read from the verified token, never from a header.
+      organizer-emails: ${CONNEXA_ORGANIZER_EMAILS:}
+      # Email/password sign-up lets anyone claim any address, so an unverified
+      # address must not satisfy the allowlist.
+      require-verified-email: ${CONNEXA_ORGANIZER_REQUIRE_VERIFIED_EMAIL:true}
+      check-revoked: ${CONNEXA_IDENTITY_CHECK_REVOKED:true}
   assistant:
     mode: ${CONNEXA_ASSISTANT_MODE:disabled}
+    provider: ${CONNEXA_AI_PROVIDER:}
+    model: ${CONNEXA_AI_MODEL:}
+    embedding-model: ${CONNEXA_AI_EMBEDDING_MODEL:gemini-embedding-001}
+    api-key: ${CONNEXA_AI_API_KEY:}
+    max-requests-per-minute: ${CONNEXA_AI_MAX_REQUESTS_PER_MINUTE:20}
+    max-output-tokens: ${CONNEXA_AI_MAX_OUTPUT_TOKENS:1024}
+    # How many retrieved events are shown to the model as citable context.
+    max-context-events: ${CONNEXA_AI_MAX_CONTEXT_EVENTS:8}
+    request-timeout: ${CONNEXA_AI_REQUEST_TIMEOUT:30s}
+  # Announcement intake. Disabled until a token is set, so an unconfigured
+  # deployment exposes no machine-to-machine entry point.
+  ingestion:
+    api-token: ${CONNEXA_INGESTION_API_TOKEN:}
+    organizer-name: ${CONNEXA_INGESTION_ORGANIZER_NAME:Campus Announcements}
+  # Door check-in. Disabled until a signing secret is set; a predictable key
+  # would make every pass forgeable.
+  checkin:
+    secret: ${CONNEXA_CHECKIN_SECRET:}
+    pass-validity: ${CONNEXA_CHECKIN_PASS_VALIDITY:5m}
+  # Organizer image uploads. Disabled until an account is configured. The secret signs
+  # upload requests and is never sent to a client, which is why the phone asks this
+  # service for a signature instead of holding one.
+  media:
+    cloud-name: ${CONNEXA_CLOUDINARY_CLOUD_NAME:}
+    api-key: ${CONNEXA_CLOUDINARY_API_KEY:}
+    api-secret: ${CONNEXA_CLOUDINARY_API_SECRET:}
+    folder: ${CONNEXA_CLOUDINARY_FOLDER:connexa/events}
+    max-upload-bytes: ${CONNEXA_STORAGE_MAX_BYTES:10485760}
   persistence:
     mode: ${CONNEXA_PERSISTENCE_MODE:in-memory}
   integrations:

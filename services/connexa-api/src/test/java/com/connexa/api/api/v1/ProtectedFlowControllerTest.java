@@ -75,4 +75,47 @@ class ProtectedFlowControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON));
     }
+
+    /**
+     * Seat availability is deliberately outside the boundary. It is the same number a poster
+     * carries, and hiding it left a browsing visitor unable to tell a full event from an open
+     * one — the fact that decides whether they sign up at all.
+     */
+    @Test
+    void seatAvailabilityIsReadableWithoutSigningIn() throws Exception {
+        UUID eventId = UUID.randomUUID();
+
+        // Not found rather than unauthorized: the request reached the lookup, which is the
+        // point. An unknown ID is the only thing left to complain about.
+        mockMvc.perform(get("/api/v1/events/{eventId}/capacity", eventId))
+                .andExpect(status().isNotFound());
+    }
+
+    /**
+     * The counterpart to the rule above: how many seats remain is public, but who holds one
+     * is not. An anonymous caller must never learn an individual's plans.
+     */
+    @Test
+    void anIndividualsPlansStayPrivateEvenThoughTheCountIsPublic() throws Exception {
+        UUID eventId = UUID.randomUUID();
+
+        mockMvc.perform(get("/api/v1/events/{eventId}/attendance", eventId))
+                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(get("/api/v1/events/{eventId}/waitlist/me", eventId))
+                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(get("/api/v1/me/attendance"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    /**
+     * A held-open connection is a resource an anonymous caller could take without limit, so
+     * the live stream keeps the gate the plain read gives up.
+     */
+    @Test
+    void theLiveStreamStillRequiresAnIdentity() throws Exception {
+        mockMvc.perform(get("/api/v1/events/{eventId}/capacity/stream", UUID.randomUUID()))
+                .andExpect(status().isUnauthorized());
+    }
 }

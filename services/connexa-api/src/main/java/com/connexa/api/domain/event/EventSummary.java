@@ -18,7 +18,33 @@ public record EventSummary(
         EventStatus status,
         long revision,
         Instant createdAt,
-        Instant updatedAt) {
+        Instant updatedAt,
+        String coverImageUrl) {
+
+    /**
+     * Most events have no cover.
+     *
+     * <p>An announcement arriving by email carries no artwork, so the common case is stated
+     * without having to write null at every construction site. The feed draws a generated
+     * banner when this is absent rather than leaving a gap.
+     */
+    public EventSummary(
+            UUID id,
+            String title,
+            String summary,
+            Instant startsAt,
+            Instant endsAt,
+            String timeZone,
+            String venueName,
+            String category,
+            String organizerName,
+            EventStatus status,
+            long revision,
+            Instant createdAt,
+            Instant updatedAt) {
+        this(id, title, summary, startsAt, endsAt, timeZone, venueName, category,
+                organizerName, status, revision, createdAt, updatedAt, null);
+    }
 
     public EventSummary {
         Objects.requireNonNull(id, "id is required");
@@ -37,6 +63,14 @@ public record EventSummary(
         }
         if (updatedAt.isBefore(createdAt)) {
             throw new IllegalArgumentException("updatedAt cannot be before createdAt");
+        }
+        // Blank and absent mean the same thing here, and collapsing them means every
+        // reader has one case to handle rather than two.
+        coverImageUrl = coverImageUrl == null || coverImageUrl.isBlank()
+                ? null
+                : coverImageUrl.trim();
+        if (coverImageUrl != null && coverImageUrl.length() > 512) {
+            throw new IllegalArgumentException("coverImageUrl must not exceed 512 characters");
         }
     }
 

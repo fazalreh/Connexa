@@ -1,0 +1,2 @@
+Place the Firebase service-account JSON here as service-account.connexa.json.
+Files matching service-account*.json are gitignored and must never be committed.
