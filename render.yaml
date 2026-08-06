@@ -75,3 +75,65 @@ services:
         sync: false
       - key: CONNEXA_CLOUDINARY_API_SECRET
         sync: false
+
+  # ---------------------------------------------------------------------------------
+  # Announcement ingestion, every two hours.
+  #
+  # The worker reads the mailbox once per invocation and exits; it has no loop of its own.
+  # That is deliberate — a scheduler owns the timing, which means a run that hangs is the
+  # platform's problem to kill rather than a stuck process nobody notices.
+  #
+  # Re-reading a message is harmless: submission is keyed on the source message, so the
+  # server rejects anything it has already ingested. A missed run costs nothing but delay.
+  #
+  # No build step: the package uses only the Python standard library, so there is nothing
+  # to install.
+  # ---------------------------------------------------------------------------------
+  - type: cron
+    name: connexa-ingestion
+    runtime: python
+    plan: free
+    region: singapore
+    branch: main
+    schedule: "0 */2 * * *"          # minute 0 of every second hour, UTC
+    buildCommand: "python --version"
+    startCommand: "PYTHONPATH=ingestion python -m connexa_ingestion"
+
+    envVars:
+      # Points at this service's own API. Replace with the deployed URL once it is known.
+      - key: CONNEXA_API_BASE_URL
+        sync: false
+      - key: CONNEXA_INGESTION_API_TOKEN
+        sync: false
+      # Text model only. The embedding model cannot generate, and extraction generates.
+      - key: CONNEXA_AI_MODEL
+        value: gemini-3.6-flash
+      - key: CONNEXA_AI_API_KEY
+        sync: false
+
+      # Mailbox. The password must be a dedicated app password, never an account password.
+      - key: CONNEXA_ANNOUNCEMENT_MAILBOX
+        sync: false
+      - key: CONNEXA_MAIL_USERNAME
+        sync: false
+      - key: CONNEXA_MAIL_PASSWORD
+        sync: false
+      - key: CONNEXA_MAIL_HOST
+        value: imap.gmail.com
+      - key: CONNEXA_MAIL_PORT
+        value: "993"
+      - key: CONNEXA_MAIL_FOLDER
+        value: INBOX
+
+      # The trust boundary. Anyone who learns the address can send to it, so a run refuses
+      # to start until at least one sender or domain is approved.
+      - key: CONNEXA_INGESTION_ALLOWED_SENDERS
+        sync: false
+      - key: CONNEXA_INGESTION_ALLOWED_DOMAINS
+        sync: false
+
+      # A ceiling per run, so a flooded mailbox cannot turn one execution into an unbounded job.
+      - key: CONNEXA_INGESTION_MAX_MESSAGES_PER_RUN
+        value: "50"
+      - key: CONNEXA_INGESTION_LOCK_FILE
+        value: /tmp/connexa-ingestion.lock

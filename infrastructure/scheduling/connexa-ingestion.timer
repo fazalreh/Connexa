@@ -1,0 +1,20 @@
+[Unit]
+Description=Run Connexa announcement ingestion every two hours
+
+[Timer]
+# Every second hour, on the hour.
+OnCalendar=*-*-* 00/2:00:00
+
+# Spread the start over five minutes. Without this every host with this timer fires at
+# exactly the same second, which is unkind to a mailbox provider and makes rate limiting
+# look like a fault in the worker.
+RandomizedDelaySec=300
+
+# If the machine was asleep or off when a run was due, run once after it comes back rather
+# than silently skipping. Announcements are not urgent, but they should not be lost.
+Persistent=true
+
+Unit=connexa-ingestion.service
+
+[Install]
+WantedBy=timers.target

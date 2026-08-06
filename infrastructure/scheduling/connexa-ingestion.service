@@ -1,0 +1,39 @@
+[Unit]
+Description=Connexa announcement ingestion (single pass)
+Documentation=file:///opt/connexa/ingestion/connexa_ingestion/README.md
+# Nothing to read from a mailbox before the network is up.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+
+# Adjust these three to the deployment.
+User=connexa
+WorkingDirectory=/opt/connexa
+Environment=PYTHONPATH=/opt/connexa/ingestion
+
+# Configuration and secrets come from a file that root owns and only this user can read.
+# Passing them on the command line would put them in the process list, where any local
+# account can read them.
+EnvironmentFile=/etc/connexa/ingestion.env
+
+ExecStart=/usr/bin/python3 -m connexa_ingestion
+
+# A run that hangs on a mailbox is killed rather than left holding the lock. Comfortably
+# longer than a normal pass, short enough that the next scheduled run is not blocked.
+TimeoutStartSec=600
+
+# The worker needs the network, its own code, and a lock file. Nothing else.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/connexa
+RestrictAddressFamilies=AF_INET AF_INET6
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
