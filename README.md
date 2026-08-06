@@ -80,8 +80,8 @@ Requests are rate limited and output-token capped.
 ### Semantic search and recommendations
 
 `GET /api/v1/events/search` ranks by meaning, not keywords — *"quiet evening outdoors"*
-returns **Rooftop Film Night** and **Open Mic Poetry Evening**, neither sharing a word with the
-query. Events are embedded with `gemini-embedding-001` at 768 dimensions and compared by cosine
+ranks **Rooftop Film Night** first, which shares no word at all with the query, ahead of
+**Open Mic Poetry Evening**. Events are embedded with `gemini-embedding-001` at 768 dimensions and compared by cosine
 similarity.
 
 Two things worth knowing. The model returns vectors with a norm of about 0.59, so **vectors are
@@ -105,8 +105,12 @@ tested exhaustively with no provider involved.
 
 | Model | Purpose |
 |---|---|
-| `gemini-2.5-flash` | Assistant replies, announcement extraction |
+| `gemini-3.6-flash` | Assistant replies and announcement extraction |
 | `gemini-embedding-001` | Event embeddings for search and recommendations |
+
+The text model is chosen entirely by `CONNEXA_AI_MODEL`; the API declares no default, so an
+unset value leaves the assistant disabled rather than silently picking a model. The ingestion
+worker falls back to `gemini-2.5-flash` only when that variable is absent.
 
 ---
 

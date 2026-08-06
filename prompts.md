@@ -149,7 +149,8 @@ the absolute number is not. **Raw similarity percentages are never shown in the 
 match" reads as precision the number does not have.
 
 Verified against live data: *"quiet evening outdoors"* returned **Rooftop Film Night** and
-**Open Mic Poetry Evening**, neither of which shares a keyword with the query.
+**Open Mic Poetry Evening**. The top result shares no word at all with the query — its
+relevance is carried entirely by meaning.
 
 ---
 
