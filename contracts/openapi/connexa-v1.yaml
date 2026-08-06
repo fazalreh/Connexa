@@ -190,6 +190,35 @@ paths:
           $ref: '#/components/responses/AuthenticationRequired'
         '404':
           $ref: '#/components/responses/EventNotFound'
+  /api/v1/events/{eventId}/capacity:
+    get:
+      operationId: getEventCapacity
+      summary: Retrieve seat availability for one event.
+      description: >-
+        An event that declared no seat limit is unbounded; `totalCapacity` and
+        `spotsRemaining` are both null in that case, which distinguishes "no limit" from
+        "no seats left".
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/EventId'
+      responses:
+        '200':
+          description: Seat availability for the event.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventCapacity'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '404':
+          $ref: '#/components/responses/EventNotFound'
   /api/v1/events/{eventId}/saved:
     put:
       operationId: saveEvent
@@ -250,6 +279,10 @@ paths:
       parameters:
         - $ref: '#/components/parameters/RequestId'
         - $ref: '#/components/parameters/EventId'
+      description: >-
+        A status of GOING reserves one seat against the event's capacity; any other status
+        releases a seat previously held by the caller. Repeating the same status does not
+        consume a further seat, so the operation is safe to retry.
       requestBody:
         required: true
         content:
@@ -272,6 +305,8 @@ paths:
           $ref: '#/components/responses/AuthenticationRequired'
         '404':
           $ref: '#/components/responses/EventNotFound'
+        '409':
+          $ref: '#/components/responses/EventAtCapacity'
     delete:
       operationId: clearEventRsvp
       summary: Clear the caller's RSVP status for an event.
@@ -354,6 +389,414 @@ paths:
           $ref: '#/components/responses/AuthenticationRequired'
         '403':
           $ref: '#/components/responses/OrganizerPermissionRequired'
+  /api/v1/organizer/events/{draftId}/publish:
+    post:
+      operationId: publishOrganizerEventDraft
+      summary: Publish one of the current organizer's drafts as a public event.
+      description: >-
+        Requires a verified identity with the `ORGANIZER` role that owns the draft. The
+        draft is retained as the organizer's private working copy and is linked to the event
+        it produced, so a second publish is refused rather than creating a duplicate
+        listing. The draft's capacity becomes the event's seat limit, and its description is
+        condensed into the public summary.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/DraftId'
+      responses:
+        '201':
+          description: Public event created from the draft.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventSummary'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '403':
+          $ref: '#/components/responses/OrganizerPermissionRequired'
+        '404':
+          $ref: '#/components/responses/OrganizerDraftNotFound'
+        '409':
+          $ref: '#/components/responses/DraftAlreadyPublished'
+        '503':
+          $ref: '#/components/responses/PublicationUnavailable'
+  /api/v1/events/search:
+    get:
+      operationId: searchEvents
+      summary: Find events by meaning rather than keyword.
+      description: >-
+        The phrase is embedded and compared against the indexed catalogue, so a query such as
+        "something creative and hands on" matches a painting class that shares none of those
+        words. Results are ordered by relevance and weak matches are omitted entirely rather
+        than ranked last. Public, like the rest of event discovery.
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - name: q
+          in: query
+          required: true
+          description: Natural-language phrase.
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 200
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        '200':
+          description: Matching events, most relevant first. Empty when nothing is indexed.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchResult'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+  /api/v1/me/devices:
+    post:
+      operationId: registerDevice
+      summary: Register this device for notifications.
+      description: >-
+        The device is bound to the identity in the verified token, never to one named in the
+        request, so a token cannot be attached to another account. Re-registering an existing
+        token reassigns it, which is what stops a shared or handed-on phone from continuing to
+        receive the previous owner's notifications.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceRegistration'
+      responses:
+        '204':
+          description: The device is registered.
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+    delete:
+      operationId: unregisterDevice
+      summary: Stop sending notifications to this device.
+      description: Used on sign-out. Idempotent; an already-removed device is the desired state.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceRegistration'
+      responses:
+        '204':
+          description: The device is not registered.
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+  /api/v1/me/recommendations:
+    get:
+      operationId: listRecommendations
+      summary: Suggestions based on the caller's own history.
+      description: >-
+        Built from the events the caller saved or responded to, excluding those they have
+        already responded to. Returns an empty list when there is no history to learn from
+        rather than guessing. Private, because the result discloses that history.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        '200':
+          description: Suggested events, most relevant first.
+          headers:
+            X-Request-Id:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SearchResult'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+  /api/v1/search/index:
+    post:
+      operationId: rebuildSearchIndex
+      summary: Embed events that are not yet in the semantic index.
+      description: >-
+        Restricted to organizers because it spends provider quota. Safe to repeat: only
+        events with no vector for the current model are embedded.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - name: batchSize
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+      responses:
+        '200':
+          description: How many events were indexed by this run.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [indexed]
+                properties:
+                  indexed:
+                    type: integer
+                    minimum: 0
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '403':
+          $ref: '#/components/responses/OrganizerPermissionRequired'
+  /api/v1/events/{eventId}/capacity/stream:
+    get:
+      operationId: streamEventCapacity
+      summary: Stream seat availability as it changes.
+      description: >-
+        A server-sent event stream. The current count arrives immediately on subscribe, then
+        again whenever an RSVP changes it, so a client never renders a stale number. Periodic
+        comment lines keep the connection open through intermediaries and can be ignored.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/EventId'
+      responses:
+        '200':
+          description: An open event stream of `capacity` events.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: >-
+                  Each `data:` line is an EventCapacity object.
+                example: |
+                  event: capacity
+                  data: {"eventId":"...","totalCapacity":30,"spotsRemaining":28,"reserved":2,"full":false}
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '404':
+          $ref: '#/components/responses/EventNotFound'
+  /api/v1/events/{eventId}/waitlist:
+    post:
+      operationId: joinEventWaitlist
+      summary: Join the queue for a full event.
+      description: >-
+        Refused while seats remain, because queueing behind a promotion the caller could take
+        directly would leave them worse off. Joining twice keeps the original place rather
+        than moving the caller to the back.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/EventId'
+      responses:
+        '201':
+          description: The caller's place in the queue.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WaitlistStatus'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '404':
+          $ref: '#/components/responses/EventNotFound'
+        '409':
+          $ref: '#/components/responses/EventNotFull'
+        '503':
+          $ref: '#/components/responses/PublicationUnavailable'
+    get:
+      operationId: getWaitlistPlace
+      summary: The caller's own place in the queue.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/EventId'
+      responses:
+        '200':
+          description: The caller is waiting, at the given rank.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WaitlistStatus'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '404':
+          description: The caller is not waiting, either never queued or already promoted.
+    delete:
+      operationId: leaveEventWaitlist
+      summary: Give up the caller's place in the queue.
+      description: Idempotent; leaving a queue the caller was not in is the state they wanted.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/EventId'
+      responses:
+        '204':
+          description: The caller is not in the queue.
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+  /api/v1/events/{eventId}/check-in-pass:
+    get:
+      operationId: issueCheckInPass
+      summary: Issue the caller a signed pass to present at the door.
+      description: >-
+        The returned text is rendered as a QR code. It is signed and short-lived, and issued
+        only for the calling attendee, so a screenshot taken earlier stops working and no one
+        can obtain a pass for somebody else.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/EventId'
+      responses:
+        '200':
+          description: A signed pass and the moment it lapses.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckInPass'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '404':
+          $ref: '#/components/responses/EventNotFound'
+        '422':
+          $ref: '#/components/responses/InvalidCheckInPass'
+  /api/v1/events/{eventId}/check-in:
+    post:
+      operationId: redeemCheckInPass
+      summary: Honour a scanned pass at the door.
+      description: >-
+        Organizers only; otherwise any attendee could scan a neighbour's screen. A repeat scan
+        succeeds and reports the original arrival time rather than overwriting it.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/EventId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pass]
+              properties:
+                pass:
+                  type: string
+                  maxLength: 512
+                  description: The exact text read from the QR code.
+      responses:
+        '200':
+          description: The guest is checked in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckInResult'
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '403':
+          $ref: '#/components/responses/OrganizerPermissionRequired'
+        '409':
+          $ref: '#/components/responses/NotAttending'
+        '422':
+          $ref: '#/components/responses/InvalidCheckInPass'
+  /api/v1/events/{eventId}/check-in-count:
+    get:
+      operationId: countCheckedIn
+      summary: How many guests have arrived.
+      security:
+        - ConnexaBearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+        - $ref: '#/components/parameters/EventId'
+      responses:
+        '200':
+          description: Number of guests checked in.
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
+                minimum: 0
+        '401':
+          $ref: '#/components/responses/AuthenticationRequired'
+        '403':
+          $ref: '#/components/responses/OrganizerPermissionRequired'
+  /api/v1/ingestion/events:
+    post:
+      operationId: submitAnnouncementEvent
+      summary: Submit an event derived from an approved announcement source.
+      description: >-
+        Machine-to-machine intake for the announcement reader, authenticated by a shared token
+        rather than a user identity because the caller is a scheduled process. Repeat
+        submissions of the same source message resolve to the event it already created, so a
+        reader that re-reads its mailbox cannot create duplicates.
+      security:
+        - ConnexaIngestionToken: []
+      parameters:
+        - $ref: '#/components/parameters/RequestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IngestionEventRequest'
+      responses:
+        '201':
+          description: A new event was created from this announcement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestionEventResult'
+        '200':
+          description: This announcement had already been ingested; the existing event is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IngestionEventResult'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '403':
+          description: The ingestion token was missing or wrong.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '503':
+          $ref: '#/components/responses/PublicationUnavailable'
   /api/v1/assistant/messages:
     post:
       operationId: sendAssistantMessage
@@ -438,6 +881,13 @@ paths:
           $ref: '#/components/responses/NotificationNotFound'
 components:
   securitySchemes:
+    ConnexaIngestionToken:
+      type: apiKey
+      in: header
+      name: X-Connexa-Ingestion-Token
+      description: >-
+        Shared token for the announcement reader. Verified in constant time, and checked
+        before the request body is bound so an unauthorised caller cannot probe the schema.
     ConnexaBearerAuth:
       type: http
       scheme: bearer
@@ -470,6 +920,14 @@ components:
       schema:
         type: string
         format: uuid
+    DraftId:
+      name: draftId
+      in: path
+      required: true
+      description: Opaque organizer draft identifier. Distinct from the published event ID.
+      schema:
+        type: string
+        format: uuid
     Page:
       name: page
       in: query
@@ -498,6 +956,38 @@ components:
         type: string
         example: Bearer
   responses:
+    EventNotFull:
+      description: >-
+        The event still has seats, so the caller should respond directly rather than queueing.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    InvalidCheckInPass:
+      description: >-
+        The scanned code could not be honoured. The detail is written for the person holding
+        the scanner and never distinguishes a forged signature from an unknown one.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotAttending:
+      description: >-
+        The signature was genuine but the guest holds no seat, usually because they cancelled
+        after the pass was issued.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
     InvalidRequest:
       description: The request was syntactically valid HTTP but violated an API rule.
       headers:
@@ -545,6 +1035,52 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
+    OrganizerDraftNotFound:
+      description: >-
+        No draft exists for the supplied ID under the calling organizer. A draft owned by a
+        different organizer reports the same result, so ownership cannot be probed.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    DraftAlreadyPublished:
+      description: >-
+        The draft has already produced a public event. The problem body carries
+        `publishedEventId` identifying that event.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    PublicationUnavailable:
+      description: >-
+        Publishing requires durable storage, which is not currently configured. A published
+        event must outlive a restart, so the service refuses rather than creating a listing
+        that would silently disappear.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    EventAtCapacity:
+      description: >-
+        The event has no remaining seats. The request conflicts with the current state of
+        the event rather than being malformed, and the same request may succeed later if a
+        seat is released.
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
     NotificationNotFound:
       description: No notification exists for the supplied ID in the caller's inbox.
       headers:
@@ -555,6 +1091,132 @@ components:
           schema:
             $ref: '#/components/schemas/Problem'
   schemas:
+    DeviceRegistration:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+          maxLength: 512
+          description: The messaging token issued to this device by the provider.
+        platform:
+          type: string
+          maxLength: 32
+          description: Which client produced the token. Recorded for diagnostics only.
+    SearchResult:
+      type: object
+      required: [event, relevance]
+      properties:
+        event:
+          $ref: '#/components/schemas/EventSummary'
+        relevance:
+          type: number
+          format: double
+          minimum: -1
+          maximum: 1
+          description: >-
+            Cosine similarity between the query and the event. Surfaced so a client can
+            explain the ordering; it is not a percentage and should not be shown as one.
+    WaitlistStatus:
+      type: object
+      required: [eventId, promoted]
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        placeInQueue:
+          type: [integer, 'null']
+          format: int64
+          minimum: 1
+          description: >-
+            Rank among those still waiting, so it stays truthful as people ahead are
+            promoted. Null once the caller has been given a seat.
+        promoted:
+          type: boolean
+          description: True once a seat has been handed to this entry.
+        joinedAt:
+          type: [string, 'null']
+          format: date-time
+    CheckInPass:
+      type: object
+      required: [pass, expiresAt]
+      properties:
+        pass:
+          type: string
+          description: Signed text to render as a QR code.
+        expiresAt:
+          type: string
+          format: date-time
+          description: Lets a client refresh the code before a steward would reject it.
+    CheckInResult:
+      type: object
+      required: [arrivedAt, alreadyCheckedIn]
+      properties:
+        arrivedAt:
+          type: string
+          format: date-time
+          description: The original arrival, not the time of this scan.
+        alreadyCheckedIn:
+          type: boolean
+          description: True on a repeat scan, so a steward sees a distinct outcome.
+    IngestionEventRequest:
+      type: object
+      required: [sourceSystem, sourceRecordId, title, summary, startsAt, endsAt, timeZone, venueName, category]
+      properties:
+        sourceSystem:
+          type: string
+          maxLength: 64
+          description: Which reader produced this, for example `imap`.
+        sourceRecordId:
+          type: string
+          maxLength: 512
+          description: >-
+            Identifies the originating message. Together with sourceSystem this is what makes
+            a repeated submission resolve to the event it already created.
+        contentHash:
+          type: string
+          maxLength: 128
+        title:
+          type: string
+          minLength: 3
+          maxLength: 160
+        summary:
+          type: string
+          minLength: 3
+          maxLength: 500
+        startsAt:
+          type: string
+          format: date-time
+        endsAt:
+          type: string
+          format: date-time
+        timeZone:
+          type: string
+          maxLength: 64
+        venueName:
+          type: string
+          maxLength: 200
+        category:
+          type: string
+          maxLength: 80
+        organizerName:
+          type: [string, 'null']
+          maxLength: 200
+        totalCapacity:
+          type: [integer, 'null']
+          minimum: 1
+    IngestionEventResult:
+      type: object
+      required: [eventId, created, title]
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        created:
+          type: boolean
+          description: False when the submission matched an announcement already ingested.
+        title:
+          type: string
     PlatformStatus:
       type: object
       required: [service, environment, status, observedAt, requestId, disabledIntegrations]
@@ -764,6 +1426,34 @@ components:
           type: [string, 'null']
           format: date-time
           description: Null when neither a saved marker nor an RSVP exists.
+    EventCapacity:
+      type: object
+      required: [eventId, totalCapacity, spotsRemaining, reserved, full]
+      description: >-
+        Seat availability for one event. Seats are held only by attendees whose RSVP status
+        is GOING.
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        totalCapacity:
+          type: [integer, 'null']
+          format: int32
+          minimum: 0
+          description: Declared seat limit, or null when the event is unbounded.
+        spotsRemaining:
+          type: [integer, 'null']
+          format: int32
+          minimum: 0
+          description: Seats still available, or null when the event is unbounded.
+        reserved:
+          type: integer
+          format: int32
+          minimum: 0
+          description: Seats currently held by attendees who responded GOING.
+        full:
+          type: boolean
+          description: Always false for an unbounded event.
     RsvpUpdateRequest:
       type: object
       required: [status]
