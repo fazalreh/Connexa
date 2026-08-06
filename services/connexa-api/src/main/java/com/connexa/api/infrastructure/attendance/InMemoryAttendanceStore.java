@@ -2,6 +2,7 @@ package com.connexa.api.infrastructure.attendance;
 
 import com.connexa.api.domain.attendance.AttendanceState;
 import com.connexa.api.domain.attendance.RsvpStatus;
+import com.connexa.api.domain.event.EventCapacity;
 import com.connexa.api.domain.identity.IdentityKey;
 import java.time.Instant;
 import java.util.Comparator;
@@ -74,6 +75,16 @@ public class InMemoryAttendanceStore implements AttendanceStore {
                 current != null && current.saved(),
                 rsvpStatus,
                 rsvpStatus != null || (current != null && current.saved()) ? updatedAt : null));
+    }
+
+    /**
+     * Always empty. This mode has no event catalog, so there is no event whose capacity
+     * could be reported and no reservation is ever taken here.
+     */
+    @Override
+    public Optional<EventCapacity> findCapacity(UUID eventId) {
+        Objects.requireNonNull(eventId, "eventId is required");
+        return Optional.empty();
     }
 
     private AttendanceState update(

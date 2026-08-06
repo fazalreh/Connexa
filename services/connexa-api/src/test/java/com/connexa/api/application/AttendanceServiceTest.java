@@ -16,6 +16,7 @@ import com.connexa.api.domain.identity.IdentityRole;
 import com.connexa.api.domain.identity.VerifiedIdentity;
 import com.connexa.api.infrastructure.attendance.InMemoryAttendanceStore;
 import com.connexa.api.infrastructure.event.EventCatalog;
+import com.connexa.api.infrastructure.realtime.CapacityBroadcaster;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
@@ -29,7 +30,8 @@ class AttendanceServiceTest {
         UUID eventId = UUID.randomUUID();
         AttendanceService service = new AttendanceService(
                 new InMemoryAttendanceStore(),
-                new EventQueryService(catalogFor(eventId)));
+                new EventQueryService(catalogFor(eventId)),
+                new CapacityBroadcaster());
         VerifiedIdentity identity = attendeeIdentity();
 
         AttendanceState saved = service.save(identity, eventId);
