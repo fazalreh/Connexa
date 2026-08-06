@@ -42,6 +42,8 @@ public final class EventListPresenter {
             "Unable to load events. Check the connection and try again.";
 
     private final EventDataSource eventDataSource;
+    /** Set only when the data source can do meaning-based search. */
+    private final com.connexa.mobile.core.network.EventApiClient searchable;
     private final Executor backgroundExecutor;
     private final Executor uiExecutor;
     private final View view;
@@ -60,6 +62,9 @@ public final class EventListPresenter {
             Executor uiExecutor,
             View view) {
         this.eventDataSource = Objects.requireNonNull(eventDataSource, "eventDataSource is required");
+        this.searchable = eventDataSource instanceof com.connexa.mobile.core.network.EventApiClient client
+                ? client
+                : null;
         this.backgroundExecutor = Objects.requireNonNull(backgroundExecutor, "backgroundExecutor is required");
         this.uiExecutor = Objects.requireNonNull(uiExecutor, "uiExecutor is required");
         this.view = Objects.requireNonNull(view, "view is required");
@@ -95,11 +100,19 @@ public final class EventListPresenter {
         requestInFlight = false;
     }
 
+    private static boolean hasPhrase(String query) {
+        return query != null && query.trim().length() >= 2;
+    }
+
     private void requestPage(long version, boolean initialLoad, String query, int page) {
         try {
             backgroundExecutor.execute(() -> {
                 try {
-                    EventPage eventPage = eventDataSource.listPublishedEvents(query, page, PAGE_SIZE);
+                    // A typed phrase goes through meaning-based search; browsing with no
+                    // phrase stays on the paged catalogue, which search does not paginate.
+                    EventPage eventPage = searchable != null && page == 0 && hasPhrase(query)
+                            ? searchable.searchEvents(query, PAGE_SIZE)
+                            : eventDataSource.listPublishedEvents(query, page, PAGE_SIZE);
                     dispatchPage(version, initialLoad, page, eventPage);
                 } catch (IOException | RuntimeException exception) {
                     dispatchFailure(version, initialLoad);

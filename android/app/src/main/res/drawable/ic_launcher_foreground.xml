@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Connexa mark: six nodes on an arc that opens to the right, reading as a C and as
+    a gathering at the same time.
+
+    The geometry is computed rather than placed by hand - the nodes are evenly spaced
+    by angle on a single ring, which is what makes the shape read as constructed. Every
+    dimension derives from the safe radius, so the same design regenerates at any size
+    with its proportions intact.
+
+    Adaptive icons are 108dp with only the centre 72dp guaranteed visible, so the
+    artwork stays within 36 of the centre at 54,54.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- The arc is drawn first so the nodes sit over its ends. -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.0"
+        android:strokeAlpha="0.45"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M66.4,36.3 A21.6,21.6 0 1,0 66.4,71.7" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M66.4,36.3m-4.7,0a4.7,4.7 0 1,0 9.4,0a4.7,4.7 0 1,0 -9.4,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M48.4,33.1m-4.7,0a4.7,4.7 0 1,0 9.4,0a4.7,4.7 0 1,0 -9.4,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34.4,44.9m-4.7,0a4.7,4.7 0 1,0 9.4,0a4.7,4.7 0 1,0 -9.4,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34.4,63.1m-4.7,0a4.7,4.7 0 1,0 9.4,0a4.7,4.7 0 1,0 -9.4,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M48.4,74.9m-4.7,0a4.7,4.7 0 1,0 9.4,0a4.7,4.7 0 1,0 -9.4,0" />
+
+    <!-- The accent node gives the ring a direction rather than
+         leaving it a symmetrical horseshoe. -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M66.4,71.7m-6.3,0a6.3,6.3 0 1,0 12.5,0a6.3,6.3 0 1,0 -12.5,0" />
+</vector>

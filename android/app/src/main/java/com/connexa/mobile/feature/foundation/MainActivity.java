@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.splashscreen.SplashScreen;
 import com.connexa.mobile.databinding.ActivityMainBinding;
 import com.connexa.mobile.feature.assistant.AssistantActivity;
 import com.connexa.mobile.feature.auth.SignInActivity;
@@ -18,6 +19,9 @@ public final class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        // Installed before super.onCreate so the system hands the splash over to this
+        // activity's own theme. Called later, the first frame flashes the splash colours.
+        SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

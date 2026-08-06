@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The Connexa mark for the launch screen: the same six-node arc as the launcher icon,
+    so the icon the user tapped and the mark that greets them are one thing.
+
+    The system masks this slot to a circle of radius 96 about the centre at 144,144.
+    Every node's distance from the centre plus its own radius must stay inside that -
+    an earlier version overflowed and the mask cut a node into a wedge.
+
+    Drawn opaque white: a launch screen appears before any theme attribute resolves.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="288dp"
+    android:height="288dp"
+    android:viewportWidth="288"
+    android:viewportHeight="288">
+
+    <!-- The arc is drawn first so the nodes sit over its ends. -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5.3"
+        android:strokeAlpha="0.45"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M177.0,96.8 A57.6,57.6 0 1,0 177.0,191.2" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M177.0,96.8m-12.5,0a12.5,12.5 0 1,0 25.0,0a12.5,12.5 0 1,0 -25.0,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M129.1,88.4m-12.5,0a12.5,12.5 0 1,0 25.0,0a12.5,12.5 0 1,0 -25.0,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M91.8,119.7m-12.5,0a12.5,12.5 0 1,0 25.0,0a12.5,12.5 0 1,0 -25.0,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M91.8,168.3m-12.5,0a12.5,12.5 0 1,0 25.0,0a12.5,12.5 0 1,0 -25.0,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M129.1,199.6m-12.5,0a12.5,12.5 0 1,0 25.0,0a12.5,12.5 0 1,0 -25.0,0" />
+
+    <!-- The accent node gives the ring a direction rather than
+         leaving it a symmetrical horseshoe. -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M177.0,191.2m-16.7,0a16.7,16.7 0 1,0 33.4,0a16.7,16.7 0 1,0 -33.4,0" />
+</vector>

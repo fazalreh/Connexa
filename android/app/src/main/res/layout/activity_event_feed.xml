@@ -3,19 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/connexa_surface">
+    android:fitsSystemWindows="true"
+    android:background="?attr/colorSurface">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/events_toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/connexa_primary"
+        android:background="?attr/colorSurfaceContainer"
         android:navigationContentDescription="@string/go_back"
-        android:theme="@style/ThemeOverlay.Connexa.Toolbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@android:drawable/ic_media_previous"
+        app:navigationIcon="@drawable/ic_arrow_back"
         app:title="@string/events_title" />
 
     <LinearLayout
@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:text="@string/events_description"
             android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-            android:textColor="@color/connexa_on_surface_variant" />
+            android:textColor="?attr/colorOnSurfaceVariant" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -44,10 +44,17 @@
             android:orientation="horizontal">
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="@string/event_search_hint">
+                android:hint="@string/event_search_hint"
+                app:boxCornerRadiusBottomEnd="28dp"
+                app:boxCornerRadiusBottomStart="28dp"
+                app:boxCornerRadiusTopEnd="28dp"
+                app:boxCornerRadiusTopStart="28dp"
+                app:startIconDrawable="@drawable/ic_search"
+                app:startIconTint="?attr/colorOnSurfaceVariant">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/search_input"
@@ -61,11 +68,50 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/search_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:text="@string/search_events" />
+                style="@style/Widget.Material3.Button.IconButton.Filled"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="10dp"
+                android:contentDescription="@string/search_events"
+                app:icon="@drawable/ic_search"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp" />
         </LinearLayout>
+    </LinearLayout>
+
+    <!-- Personalised row. Hidden until there is something to show, so an attendee with
+         no history never sees an empty heading. -->
+    <LinearLayout
+        android:id="@+id/recommendations_section"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/events_controls">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:drawablePadding="8dp"
+            android:gravity="center_vertical"
+            android:text="@string/events_recommended"
+            android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            app:drawableStartCompat="@drawable/ic_assistant"
+            app:drawableTint="?attr/colorPrimary" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recommendations_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
     </LinearLayout>
 
     <FrameLayout
@@ -75,10 +121,10 @@
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/events_controls">
+        app:layout_constraintTop_toBottomOf="@id/recommendations_section">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/event_list"
@@ -102,21 +148,25 @@
             android:id="@+id/events_loading_state"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:importantForAccessibility="no">
 
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:indeterminate="true" />
+            <!--
+                Three placeholder cards rather than a spinner. A spinner says only that
+                something is happening; these say what is about to arrive and where it will
+                sit, so the page appears to fill in rather than to change.
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/events_loading"
-                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                android:textColor="@color/connexa_on_surface_variant" />
+                Three is enough to fill the fold on a phone without paying to inflate rows
+                nobody will see.
+
+                Announced as nothing: a screen reader user gains nothing from being read a
+                description of grey rectangles.
+            -->
+            <include layout="@layout/item_event_skeleton" />
+
+            <include layout="@layout/item_event_skeleton" />
+
+            <include layout="@layout/item_event_skeleton" />
         </LinearLayout>
 
         <LinearLayout
@@ -127,12 +177,20 @@
             android:orientation="vertical"
             android:visibility="gone">
 
+            <ImageView
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_event_empty"
+                app:tint="?attr/colorOutline" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/events_empty_title"
                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                android:textColor="@color/connexa_on_surface" />
+                android:textColor="?attr/colorOnSurface" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -141,7 +199,7 @@
                 android:gravity="center"
                 android:text="@string/events_empty_description"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                android:textColor="@color/connexa_on_surface_variant" />
+                android:textColor="?attr/colorOnSurfaceVariant" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/refresh_button"
@@ -160,12 +218,20 @@
             android:orientation="vertical"
             android:visibility="gone">
 
+            <ImageView
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_error"
+                app:tint="?attr/colorError" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/events_error_title"
                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                android:textColor="@color/connexa_on_surface" />
+                android:textColor="?attr/colorOnSurface" />
 
             <TextView
                 android:id="@+id/events_error_message"
@@ -174,7 +240,7 @@
                 android:layout_marginTop="8dp"
                 android:gravity="center"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                android:textColor="@color/connexa_on_surface_variant" />
+                android:textColor="?attr/colorOnSurfaceVariant" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/retry_button"
@@ -184,5 +250,18 @@
                 android:text="@string/events_retry" />
         </LinearLayout>
     </FrameLayout>
+
+    <!--
+        Top-level navigation. Included rather than repeated so the bar cannot drift
+        out of step between the screens that show it.
+    -->
+    <include
+        android:id="@+id/bottom_navigation"
+        layout="@layout/view_bottom_navigation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

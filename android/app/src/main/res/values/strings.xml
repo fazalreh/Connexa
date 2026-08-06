@@ -85,6 +85,8 @@
     <string name="terms_agreement">I agree to the Connexa terms and privacy policy.</string>
     <string name="create_account_action">Create account</string>
     <string name="already_have_account">Already have an account? Sign in</string>
+    <string name="sign_in_in_progress">Signing you in…</string>
+    <string name="sign_up_in_progress">Creating your account…</string>
     <string name="account_access_unavailable">Account access is currently unavailable. Please try again later.</string>
     <string name="account_registration_unavailable">Account registration is currently unavailable. Please try again later.</string>
 
@@ -132,4 +134,41 @@
     <string name="organizer_registration_summary">%1$d of %2$d registrations</string>
     <string name="organizer_needs_attention">Needs attention</string>
     <string name="organizer_access_unavailable">Organizer actions are currently unavailable. Please try again later.</string>
+    <string name="home_section_explore">Explore</string>
+    <string name="home_section_you">Your space</string>
+    <string name="notification_channel_events">Event updates</string>
+    <string name="notification_channel_events_description">Waitlist promotions and reminders for events you follow.</string>
+    <string name="organizer_publishing">Publishing your event…</string>
+    <string name="organizer_published">Your event is live.</string>
+    <string name="event_waitlist_join">Join the waitlist</string>
+    <string name="event_waitlist_leave">Leave the waitlist</string>
+    <string name="event_waitlist_joined">You are on the waitlist. We will notify you if a seat opens.</string>
+    <string name="event_waitlist_left">You have left the waitlist.</string>
+    <string name="event_waitlist_failed">Could not update the waitlist. Try again.</string>
+    <string name="events_recommended">Suggested for you</string>
+
+    <!-- Navigation bar. Nouns: a bar names places, not actions. -->
+    <string name="destination_discover">Discover</string>
+    <string name="destination_calendar">Calendar</string>
+    <string name="destination_assistant">Assistant</string>
+    <string name="destination_alerts">Alerts</string>
+
+    <!-- Door check-in -->
+    <string name="check_in_pass_title">Your pass</string>
+    <string name="check_in_scanner_title">Check in guests</string>
+    <string name="check_in_instruction">Show this to a steward at the door.</string>
+    <string name="check_in_qr_description">Your check-in code</string>
+    <!-- Counts down so the holder can see the code is still good rather than guessing. -->
+    <string name="check_in_expires_in">Refreshes in %1$d:%2$02d</string>
+    <string name="check_in_pass_loading">Preparing your pass\u2026</string>
+    <string name="check_in_pass_failed">Could not get a pass. Check the connection and try again.</string>
+    <string name="check_in_invalid_event">This check-in link is not valid.</string>
+    <string name="check_in_retry">Try again</string>
+    <string name="check_in_scan_hint">Point the camera at a guest\u2019s code</string>
+    <string name="check_in_admitted">Checked in</string>
+    <string name="check_in_already">Already checked in</string>
+    <string name="check_in_refused">That pass was not accepted</string>
+    <string name="check_in_camera_needed">Connexa needs the camera to read check-in codes. Nothing is recorded or uploaded \u2014 codes are read on this device.</string>
+    <string name="check_in_camera_allow">Allow camera</string>
+    <string name="event_show_pass">Show my pass</string>
 </resources>

@@ -21,6 +21,76 @@ public final class ApiEndpointResolver {
         this.baseUri = URI.create(ensureTrailingSlash(parsed.toString()));
     }
 
+    /** Organizer draft collection. */
+    public URI organizerEvents() {
+        return baseUri.resolve("api/v1/organizer/events");
+    }
+
+    /** Publishes one draft as a public event. */
+    public URI publishOrganizerEvent(UUID draftId) {
+        return baseUri.resolve("api/v1/organizer/events/" + requireId(draftId) + "/publish");
+    }
+
+    /** Meaning-based search over the catalogue. */
+    public URI searchEvents(String phrase, int limit) {
+        String trimmed = phrase == null ? "" : phrase.trim();
+        if (trimmed.length() < 2) {
+            throw new IllegalArgumentException("search needs at least two characters");
+        }
+        if (limit < 1 || limit > 50) {
+            throw new IllegalArgumentException("limit must be between 1 and 50");
+        }
+        return baseUri.resolve(
+                "api/v1/events/search?q=" + encodeQueryValue(trimmed) + "&limit=" + limit);
+    }
+
+    /** Seat availability for one event. */
+    public URI capacity(UUID eventId) {
+        return baseUri.resolve("api/v1/events/" + requireId(eventId) + "/capacity");
+    }
+
+    /** Long-lived stream of seat availability for one event. */
+    public URI capacityStream(UUID eventId) {
+        return baseUri.resolve("api/v1/events/" + requireId(eventId) + "/capacity/stream");
+    }
+
+    /** The caller's place in an event's queue. */
+    public URI waitlist(UUID eventId) {
+        return baseUri.resolve("api/v1/events/" + requireId(eventId) + "/waitlist");
+    }
+
+    /** Who the caller is, as the service sees them. */
+    public URI currentIdentity() {
+        return baseUri.resolve("api/v1/me");
+    }
+
+    /** A signed pass for the door. */
+    public URI checkInPass(UUID eventId) {
+        return baseUri.resolve("api/v1/events/" + requireId(eventId) + "/check-in-pass");
+    }
+
+    /** Redeems a scanned pass. */
+    public URI checkIn(UUID eventId) {
+        return baseUri.resolve("api/v1/events/" + requireId(eventId) + "/check-in");
+    }
+
+    private static UUID requireId(UUID id) {
+        return Objects.requireNonNull(id, "event ID is required");
+    }
+
+    /** Suggestions derived from the caller's own history. */
+    public URI recommendations(int limit) {
+        if (limit < 1 || limit > 50) {
+            throw new IllegalArgumentException("limit must be between 1 and 50");
+        }
+        return baseUri.resolve("api/v1/me/recommendations?limit=" + limit);
+    }
+
+    /** Device registration for notifications. */
+    public URI deviceRegistration() {
+        return baseUri.resolve("api/v1/me/devices");
+    }
+
     public URI platformStatus() {
         return baseUri.resolve("api/v1/platform/status");
     }

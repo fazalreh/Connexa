@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Included by each top-level screen rather than duplicated into each layout, so the
+    bar cannot drift out of step between them.
+-->
+<com.google.android.material.bottomnavigation.BottomNavigationView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/colorSurfaceContainer"
+    app:elevation="0dp"
+    app:labelVisibilityMode="labeled"
+    app:menu="@menu/bottom_navigation" />

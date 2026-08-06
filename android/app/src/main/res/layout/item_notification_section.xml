@@ -6,4 +6,4 @@
     android:layout_marginTop="16dp"
     android:layout_marginBottom="8dp"
     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-    android:textColor="@color/connexa_on_surface" />
+    android:textColor="?attr/colorOnSurface" />

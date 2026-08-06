@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Launcher background is fixed, not theme-dependent: an adaptive icon is
+         rendered by the launcher outside the app's theme, so a night-qualified
+         value would never be read. -->
+    <color name="connexa_icon_background">#00456F</color>
+</resources>

@@ -3,16 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/connexa_surface">
+    android:fitsSystemWindows="true"
+    android:background="?attr/colorSurface">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/sign_in_toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/connexa_primary"
+        android:background="?attr/colorSurfaceContainer"
         android:navigationContentDescription="@string/go_back"
-        android:theme="@style/ThemeOverlay.Connexa.Toolbar"
-        app:navigationIcon="@android:drawable/ic_media_previous"
+        app:navigationIcon="@drawable/ic_arrow_back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -43,7 +43,7 @@
                 android:gravity="center"
                 android:text="@string/sign_in_welcome"
                 android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
-                android:textColor="@color/connexa_on_surface" />
+                android:textColor="?attr/colorOnSurface" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -52,7 +52,7 @@
                 android:gravity="center"
                 android:text="@string/sign_in_description"
                 android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-                android:textColor="@color/connexa_on_surface_variant" />
+                android:textColor="?attr/colorOnSurfaceVariant" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/sign_in_email_layout"
@@ -61,7 +61,7 @@
                 android:layout_marginTop="36dp"
                 android:hint="@string/email_address"
                 app:boxBackgroundMode="outline"
-                app:boxStrokeColor="@color/connexa_primary">
+                app:boxStrokeColor="?attr/colorPrimary">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/sign_in_email_input"
@@ -81,7 +81,7 @@
                 android:layout_marginTop="16dp"
                 android:hint="@string/password"
                 app:boxBackgroundMode="outline"
-                app:boxStrokeColor="@color/connexa_primary"
+                app:boxStrokeColor="?attr/colorPrimary"
                 app:endIconMode="password_toggle">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -112,14 +112,14 @@
                 android:accessibilityLiveRegion="polite"
                 android:gravity="center"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                android:textColor="@color/connexa_primary"
+                android:textColor="?attr/colorPrimary"
                 android:visibility="gone" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="36dp"
-                android:background="@color/connexa_outline" />
+                android:background="?attr/colorOutline" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -127,7 +127,7 @@
                 android:layout_marginTop="28dp"
                 android:text="@string/sign_in_new_user"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                android:textColor="@color/connexa_on_surface_variant" />
+                android:textColor="?attr/colorOnSurfaceVariant" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/create_account_button"

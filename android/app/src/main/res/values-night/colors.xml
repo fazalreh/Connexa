@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated Material 3 tonal scheme. Roles map to fixed tones, which is
+     what keeps contrast correct without tuning each pair by hand. -->
+<resources>
+    <color name="connexa_primary">#9FCAFF</color>
+    <color name="connexa_on_primary">#003355</color>
+    <color name="connexa_primary_container">#004A78</color>
+    <color name="connexa_on_primary_container">#D2E4FF</color>
+    <color name="connexa_secondary">#B5C8E4</color>
+    <color name="connexa_on_secondary">#1E3247</color>
+    <color name="connexa_secondary_container">#35485F</color>
+    <color name="connexa_on_secondary_container">#D2E4FF</color>
+    <color name="connexa_tertiary">#E2BADF</color>
+    <color name="connexa_on_tertiary">#452543</color>
+    <color name="connexa_tertiary_container">#5D3B5B</color>
+    <color name="connexa_on_tertiary_container">#FFD6FB</color>
+    <color name="connexa_error">#FFB3B0</color>
+    <color name="connexa_on_error">#680016</color>
+    <color name="connexa_error_container">#920023</color>
+    <color name="connexa_on_error_container">#FFDAD8</color>
+    <color name="connexa_background">#181C21</color>
+    <color name="connexa_on_background">#DEE3EA</color>
+    <color name="connexa_surface">#181C21</color>
+    <color name="connexa_on_surface">#DEE3EA</color>
+    <color name="connexa_surface_variant">#3F4753</color>
+    <color name="connexa_on_surface_variant">#BEC7D5</color>
+    <color name="connexa_outline">#89919E</color>
+    <color name="connexa_outline_variant">#3F4753</color>
+    <color name="connexa_surface_container_lowest">#000001</color>
+    <color name="connexa_surface_container_low">#181C21</color>
+    <color name="connexa_surface_container">#2D3136</color>
+    <color name="connexa_surface_container_high">#2D3136</color>
+    <color name="connexa_surface_container_highest">#43474D</color>
+    <color name="connexa_inverse_surface">#DEE3EA</color>
+    <color name="connexa_inverse_on_surface">#2D3136</color>
+    <color name="connexa_inverse_primary">#00629D</color>
+    <color name="connexa_scrim">#000001</color>
+</resources>

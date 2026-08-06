@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Category marker. Uses the secondary container so it stays clearly subordinate to
+     the event title and is never mistaken for a tappable control. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="?attr/colorSecondaryContainer" />
+    <corners android:radius="10dp" />
+</shape>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Labels are nouns, not verbs: a navigation bar names places, and a verb reads as
+    something that will happen rather than somewhere you will be.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/destination_discover"
+        android:icon="@drawable/ic_search"
+        android:title="@string/destination_discover" />
+
+    <item
+        android:id="@+id/destination_calendar"
+        android:icon="@drawable/ic_calendar"
+        android:title="@string/destination_calendar" />
+
+    <item
+        android:id="@+id/destination_assistant"
+        android:icon="@drawable/ic_assistant"
+        android:title="@string/destination_assistant" />
+
+    <item
+        android:id="@+id/destination_alerts"
+        android:icon="@drawable/ic_notifications"
+        android:title="@string/destination_alerts" />
+
+</menu>

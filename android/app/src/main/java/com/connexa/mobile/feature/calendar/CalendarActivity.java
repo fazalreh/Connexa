@@ -12,6 +12,7 @@ import com.connexa.mobile.BuildConfig;
 import com.connexa.mobile.core.network.ApiEndpointResolver;
 import com.connexa.mobile.core.network.EventApiClient;
 import com.connexa.mobile.databinding.CalendarScreenBinding;
+import com.connexa.mobile.feature.navigation.ConnexaBottomNavigation;
 import com.connexa.mobile.feature.events.EventDetailsActivity;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
@@ -34,6 +35,7 @@ public final class CalendarActivity extends AppCompatActivity implements Calenda
         super.onCreate(savedInstanceState);
         binding = CalendarScreenBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        ConnexaBottomNavigation.attach(this, binding.bottomNavigation.getRoot());
 
         formatter = new CalendarEventFormatter();
         dayAdapter = new CalendarDayAdapter(date -> presenter.selectDate(date));

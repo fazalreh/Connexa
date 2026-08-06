@@ -3,19 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/connexa_surface">
+    android:fitsSystemWindows="true"
+    android:background="?attr/colorSurface">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/calendar_toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/connexa_primary"
+        android:background="?attr/colorSurfaceContainer"
         android:navigationContentDescription="@string/go_back"
-        android:theme="@style/ThemeOverlay.Connexa.Toolbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@android:drawable/ic_media_previous"
+        app:navigationIcon="@drawable/ic_arrow_back"
         app:title="@string/calendar_title" />
 
     <androidx.core.widget.NestedScrollView
@@ -23,7 +23,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/calendar_toolbar">
@@ -38,10 +38,10 @@
                 android:id="@+id/calendar_navigation_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/connexa_surface_container"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:strokeColor="@color/connexa_outline"
+                app:strokeColor="?attr/colorOutline"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -71,7 +71,7 @@
                             android:layout_weight="1"
                             android:gravity="center"
                             android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                            android:textColor="@color/connexa_on_surface" />
+                            android:textColor="?attr/colorOnSurface" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/calendar_next_month"
@@ -95,7 +95,7 @@
                             android:gravity="center"
                             android:text="@string/calendar_weekday_monday"
                             android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                            android:textColor="@color/connexa_on_surface_variant" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
 
                         <TextView
                             android:layout_width="0dp"
@@ -104,7 +104,7 @@
                             android:gravity="center"
                             android:text="@string/calendar_weekday_tuesday"
                             android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                            android:textColor="@color/connexa_on_surface_variant" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
 
                         <TextView
                             android:layout_width="0dp"
@@ -113,7 +113,7 @@
                             android:gravity="center"
                             android:text="@string/calendar_weekday_wednesday"
                             android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                            android:textColor="@color/connexa_on_surface_variant" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
 
                         <TextView
                             android:layout_width="0dp"
@@ -122,7 +122,7 @@
                             android:gravity="center"
                             android:text="@string/calendar_weekday_thursday"
                             android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                            android:textColor="@color/connexa_on_surface_variant" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
 
                         <TextView
                             android:layout_width="0dp"
@@ -131,7 +131,7 @@
                             android:gravity="center"
                             android:text="@string/calendar_weekday_friday"
                             android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                            android:textColor="@color/connexa_on_surface_variant" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
 
                         <TextView
                             android:layout_width="0dp"
@@ -140,7 +140,7 @@
                             android:gravity="center"
                             android:text="@string/calendar_weekday_saturday"
                             android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                            android:textColor="@color/connexa_on_surface_variant" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
 
                         <TextView
                             android:layout_width="0dp"
@@ -149,7 +149,7 @@
                             android:gravity="center"
                             android:text="@string/calendar_weekday_sunday"
                             android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                            android:textColor="@color/connexa_on_surface_variant" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -168,7 +168,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                android:textColor="@color/connexa_on_surface" />
+                android:textColor="?attr/colorOnSurface" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/calendar_event_list"
@@ -195,7 +195,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/calendar_empty_title"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                    android:textColor="@color/connexa_on_surface" />
+                    android:textColor="?attr/colorOnSurface" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -204,7 +204,7 @@
                     android:gravity="center"
                     android:text="@string/calendar_empty_description"
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                    android:textColor="@color/connexa_on_surface_variant" />
+                    android:textColor="?attr/colorOnSurfaceVariant" />
             </LinearLayout>
 
             <LinearLayout
@@ -229,7 +229,7 @@
                     android:layout_marginTop="12dp"
                     android:text="@string/calendar_loading"
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                    android:textColor="@color/connexa_on_surface_variant" />
+                    android:textColor="?attr/colorOnSurfaceVariant" />
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -242,7 +242,7 @@
         android:orientation="vertical"
         android:paddingHorizontal="24dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/calendar_toolbar">
@@ -252,7 +252,7 @@
             android:layout_height="wrap_content"
             android:text="@string/calendar_error_title"
             android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-            android:textColor="@color/connexa_on_surface" />
+            android:textColor="?attr/colorOnSurface" />
 
         <TextView
             android:id="@+id/calendar_error_message"
@@ -261,7 +261,7 @@
             android:layout_marginTop="8dp"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="@color/connexa_on_surface_variant" />
+            android:textColor="?attr/colorOnSurfaceVariant" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/calendar_retry_button"
@@ -270,5 +270,18 @@
             android:layout_marginTop="12dp"
             android:text="@string/calendar_retry" />
     </LinearLayout>
+
+    <!--
+        Top-level navigation. Included rather than repeated so the bar cannot drift
+        out of step between the screens that show it.
+    -->
+    <include
+        android:id="@+id/bottom_navigation"
+        layout="@layout/view_bottom_navigation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

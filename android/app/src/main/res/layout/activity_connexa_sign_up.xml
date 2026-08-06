@@ -3,16 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/connexa_surface">
+    android:fitsSystemWindows="true"
+    android:background="?attr/colorSurface">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/sign_up_toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/connexa_primary"
+        android:background="?attr/colorSurfaceContainer"
         android:navigationContentDescription="@string/go_back"
-        android:theme="@style/ThemeOverlay.Connexa.Toolbar"
-        app:navigationIcon="@android:drawable/ic_media_previous"
+        app:navigationIcon="@drawable/ic_arrow_back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/sign_up_heading"
                 android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
-                android:textColor="@color/connexa_on_surface" />
+                android:textColor="?attr/colorOnSurface" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -49,7 +49,7 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/sign_up_description"
                 android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-                android:textColor="@color/connexa_on_surface_variant" />
+                android:textColor="?attr/colorOnSurfaceVariant" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/sign_up_full_name_layout"
@@ -58,7 +58,7 @@
                 android:layout_marginTop="28dp"
                 android:hint="@string/full_name"
                 app:boxBackgroundMode="outline"
-                app:boxStrokeColor="@color/connexa_primary">
+                app:boxStrokeColor="?attr/colorPrimary">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/sign_up_full_name_input"
@@ -78,7 +78,7 @@
                 android:layout_marginTop="16dp"
                 android:hint="@string/email_address"
                 app:boxBackgroundMode="outline"
-                app:boxStrokeColor="@color/connexa_primary">
+                app:boxStrokeColor="?attr/colorPrimary">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/sign_up_email_input"
@@ -98,7 +98,7 @@
                 android:layout_marginTop="16dp"
                 android:hint="@string/phone_number"
                 app:boxBackgroundMode="outline"
-                app:boxStrokeColor="@color/connexa_primary">
+                app:boxStrokeColor="?attr/colorPrimary">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/sign_up_phone_input"
@@ -118,7 +118,7 @@
                 android:layout_marginTop="16dp"
                 android:hint="@string/create_password"
                 app:boxBackgroundMode="outline"
-                app:boxStrokeColor="@color/connexa_primary"
+                app:boxStrokeColor="?attr/colorPrimary"
                 app:endIconMode="password_toggle">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -139,7 +139,7 @@
                 android:layout_marginTop="16dp"
                 android:hint="@string/confirm_password"
                 app:boxBackgroundMode="outline"
-                app:boxStrokeColor="@color/connexa_primary"
+                app:boxStrokeColor="?attr/colorPrimary"
                 app:endIconMode="password_toggle">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -157,7 +157,7 @@
                 android:layout_marginTop="24dp"
                 android:text="@string/sign_up_role_question"
                 android:textAppearance="@style/TextAppearance.Material3.TitleSmall"
-                android:textColor="@color/connexa_on_surface" />
+                android:textColor="?attr/colorOnSurface" />
 
             <RadioGroup
                 android:id="@+id/sign_up_role_group"
@@ -187,7 +187,7 @@
                 android:layout_height="wrap_content"
                 android:accessibilityLiveRegion="polite"
                 android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-                android:textColor="@color/connexa_error"
+                android:textColor="?attr/colorError"
                 android:visibility="gone" />
 
             <com.google.android.material.checkbox.MaterialCheckBox
@@ -203,7 +203,7 @@
                 android:layout_height="wrap_content"
                 android:accessibilityLiveRegion="polite"
                 android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-                android:textColor="@color/connexa_error"
+                android:textColor="?attr/colorError"
                 android:visibility="gone" />
 
             <com.google.android.material.button.MaterialButton
@@ -223,7 +223,7 @@
                 android:accessibilityLiveRegion="polite"
                 android:gravity="center"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                android:textColor="@color/connexa_primary"
+                android:textColor="?attr/colorPrimary"
                 android:visibility="gone" />
 
             <com.google.android.material.button.MaterialButton

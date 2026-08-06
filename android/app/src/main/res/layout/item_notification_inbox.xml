@@ -6,10 +6,10 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@color/connexa_surface_container"
+    app:cardBackgroundColor="?attr/colorSurfaceContainer"
     app:cardCornerRadius="16dp"
     app:cardElevation="0dp"
-    app:strokeColor="@color/connexa_outline"
+    app:strokeColor="?attr/colorOutline"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -30,20 +30,20 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
-                android:textColor="@color/connexa_primary" />
+                android:textColor="?attr/colorPrimary" />
 
             <TextView
                 android:id="@+id/notification_unread_indicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/connexa_primary"
-                android:paddingStart="8dp"
-                android:paddingTop="3dp"
-                android:paddingEnd="8dp"
-                android:paddingBottom="3dp"
+                android:background="@drawable/bg_badge_unread"
+                android:paddingStart="10dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="4dp"
                 android:text="@string/notification_unread"
                 android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
-                android:textColor="@color/connexa_on_primary" />
+                android:textColor="?attr/colorOnPrimaryContainer" />
         </LinearLayout>
 
         <TextView
@@ -54,7 +54,7 @@
             android:ellipsize="end"
             android:maxLines="2"
             android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="@color/connexa_on_surface" />
+            android:textColor="?attr/colorOnSurface" />
 
         <TextView
             android:id="@+id/notification_message"
@@ -64,7 +64,7 @@
             android:ellipsize="end"
             android:maxLines="3"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="@color/connexa_on_surface_variant" />
+            android:textColor="?attr/colorOnSurfaceVariant" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -79,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
-                android:textColor="@color/connexa_on_surface_variant" />
+                android:textColor="?attr/colorOnSurfaceVariant" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/notification_event_action"

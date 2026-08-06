@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    A placeholder in the shape of the card that is coming.
+
+    The blocks match the real card's geometry - pill, title, two summary lines, rule, two
+    metadata rows - because that is what makes the swap to real content feel like the page
+    filling in rather than one layout being replaced by a different one. A generic row of
+    grey bars would still be a spinner, only larger.
+
+    Widths are deliberately uneven. Text does not end at the same place on every line, and a
+    stack of identical bars reads as a loading graphic rather than as text about to arrive.
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="?attr/colorOutlineVariant"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="18dp">
+
+        <View
+            android:layout_width="96dp"
+            android:layout_height="24dp"
+            android:background="@drawable/bg_skeleton_block" />
+
+        <View
+            android:layout_width="240dp"
+            android:layout_height="26dp"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_skeleton_block" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="14dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_skeleton_block" />
+
+        <View
+            android:layout_width="200dp"
+            android:layout_height="14dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_skeleton_block" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="18dp"
+            android:background="?attr/colorOutlineVariant" />
+
+        <View
+            android:layout_width="180dp"
+            android:layout_height="14dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_skeleton_block" />
+
+        <View
+            android:layout_width="130dp"
+            android:layout_height="14dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_skeleton_block" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

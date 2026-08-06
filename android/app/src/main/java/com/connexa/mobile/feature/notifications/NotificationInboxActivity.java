@@ -12,6 +12,7 @@ import com.connexa.mobile.core.network.ApiEndpointResolver;
 import com.connexa.mobile.core.network.EventApiClient;
 import com.connexa.mobile.core.notifications.DerivedNotificationDataSource;
 import com.connexa.mobile.databinding.NotificationInboxScreenBinding;
+import com.connexa.mobile.feature.navigation.ConnexaBottomNavigation;
 import com.connexa.mobile.feature.events.EventDetailsActivity;
 import java.time.Clock;
 import java.util.concurrent.ExecutorService;
@@ -36,6 +37,7 @@ public final class NotificationInboxActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         binding = NotificationInboxScreenBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        ConnexaBottomNavigation.attach(this, binding.bottomNavigation.getRoot());
 
         adapter = new NotificationInboxAdapter(
                 eventId -> startActivity(EventDetailsActivity.newIntent(this, eventId)));

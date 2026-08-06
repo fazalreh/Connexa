@@ -1,96 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+    Landing screen. The original stacked six identical centred text links, which
+    gave no sense of what mattered. This states the primary action once inside a
+    hero, then lists the rest as full-width rows with leading icons so each
+    destination is scannable instead of read line by line.
+
+    The button ids are unchanged, so the activity's existing click bindings and
+    its tests continue to apply without modification.
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/connexa_surface">
+    android:fitsSystemWindows="true"
+    android:background="?attr/colorSurface">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/top_app_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/connexa_primary"
-        android:theme="@style/ThemeOverlay.Connexa.Toolbar"
+        android:background="?attr/colorSurfaceContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="@string/app_name" />
+        app:title="@string/app_name"
+        app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
 
-    <LinearLayout
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="32dp"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/top_app_bar">
 
-        <TextView
-            android:id="@+id/home_title"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/home_title"
-            android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
-            android:textColor="@color/connexa_on_surface" />
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp">
 
-        <TextView
-            android:id="@+id/home_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:gravity="center"
-            android:text="@string/home_description"
-            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-            android:textColor="@color/connexa_on_surface_variant" />
+            <!-- Hero uses the tonal container rather than a filled primary block
+                 so it frames the page without competing with the action inside it. -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.Material3.CardView.Filled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:cardBackgroundColor="?attr/colorPrimaryContainer"
+                app:cardCornerRadius="28dp"
+                app:cardElevation="0dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/open_events_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:text="@string/open_events" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/open_calendar_button"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/open_calendar" />
+                    <TextView
+                        android:id="@+id/home_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/home_title"
+                        android:textAppearance="@style/TextAppearance.Connexa.Display"
+                        android:textColor="?attr/colorOnPrimaryContainer" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/open_account_button"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/open_account" />
+                    <TextView
+                        android:id="@+id/home_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/home_description"
+                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                        android:textColor="?attr/colorOnPrimaryContainer" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/open_notifications_button"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/open_notifications" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/open_events_button"
+                        style="@style/Widget.Connexa.Button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:text="@string/open_events"
+                        app:icon="@drawable/ic_search"
+                        app:iconGravity="textStart" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/open_assistant_button"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/open_assistant" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="4dp"
+                android:text="@string/home_section_explore"
+                android:textAppearance="@style/TextAppearance.Connexa.Overline"
+                android:textColor="?attr/colorOnSurfaceVariant" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/open_organizer_button"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/open_organizer" />
-    </LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/open_calendar_button"
+                style="@style/Widget.Connexa.Destination"
+                android:text="@string/open_calendar"
+                app:icon="@drawable/ic_calendar" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/open_notifications_button"
+                style="@style/Widget.Connexa.Destination"
+                android:text="@string/open_notifications"
+                app:icon="@drawable/ic_notifications" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/open_assistant_button"
+                style="@style/Widget.Connexa.Destination"
+                android:text="@string/open_assistant"
+                app:icon="@drawable/ic_assistant" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="4dp"
+                android:text="@string/home_section_you"
+                android:textAppearance="@style/TextAppearance.Connexa.Overline"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/open_account_button"
+                style="@style/Widget.Connexa.Destination"
+                android:text="@string/open_account"
+                app:icon="@drawable/ic_person" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/open_organizer_button"
+                style="@style/Widget.Connexa.Destination"
+                android:text="@string/open_organizer"
+                app:icon="@drawable/ic_dashboard" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

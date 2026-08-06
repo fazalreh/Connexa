@@ -8,7 +8,7 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@color/connexa_surface_container"
+    app:cardBackgroundColor="?attr/colorSurfaceContainer"
     app:cardCornerRadius="12dp"
     app:cardElevation="0dp">
 
@@ -22,7 +22,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
-            android:textColor="@color/connexa_on_surface" />
+            android:textColor="?attr/colorOnSurface" />
 
         <TextView
             android:id="@+id/calendar_day_marker"
@@ -33,7 +33,7 @@
             android:layout_marginTop="1dp"
             android:text="&#x2022;"
             android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-            android:textColor="@color/connexa_primary"
+            android:textColor="?attr/colorPrimary"
             android:visibility="invisible" />
     </FrameLayout>
 

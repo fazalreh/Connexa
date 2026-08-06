@@ -3,20 +3,33 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/connexa_surface">
+    android:fitsSystemWindows="true"
+    android:background="?attr/colorSurface">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/notification_toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/connexa_primary"
+        android:background="?attr/colorSurfaceContainer"
         android:navigationContentDescription="@string/go_back"
-        android:theme="@style/ThemeOverlay.Connexa.Toolbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@android:drawable/ic_media_previous"
+        app:navigationIcon="@drawable/ic_arrow_back"
         app:title="@string/notifications_title" />
+
+    <!--
+        Top-level navigation. Included rather than repeated so the bar cannot drift
+        out of step between the screens that show it.
+    -->
+    <include
+        android:id="@+id/bottom_navigation"
+        layout="@layout/view_bottom_navigation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/notification_list"
@@ -27,7 +40,7 @@
         android:paddingTop="12dp"
         android:paddingEnd="16dp"
         android:paddingBottom="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/notification_toolbar" />
@@ -40,10 +53,10 @@
         android:orientation="horizontal"
         android:padding="24dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/notification_list"
-        app:layout_constraintEnd_toEndOf="@id/notification_list"
-        app:layout_constraintStart_toStartOf="@id/notification_list"
-        app:layout_constraintTop_toTopOf="@id/notification_list">
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/notification_toolbar">
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:layout_width="24dp"
@@ -57,7 +70,7 @@
             android:layout_marginStart="12dp"
             android:text="@string/notifications_loading"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="@color/connexa_on_surface_variant" />
+            android:textColor="?attr/colorOnSurfaceVariant" />
     </LinearLayout>
 
     <LinearLayout
@@ -68,10 +81,10 @@
         android:orientation="vertical"
         android:padding="24dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/notification_list"
-        app:layout_constraintEnd_toEndOf="@id/notification_list"
-        app:layout_constraintStart_toStartOf="@id/notification_list"
-        app:layout_constraintTop_toTopOf="@id/notification_list">
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/notification_toolbar">
 
         <TextView
             android:id="@+id/notification_empty_title"
@@ -79,7 +92,7 @@
             android:layout_height="wrap_content"
             android:text="@string/notifications_empty_title"
             android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="@color/connexa_on_surface" />
+            android:textColor="?attr/colorOnSurface" />
 
         <TextView
             android:id="@+id/notification_empty_message"
@@ -89,7 +102,7 @@
             android:gravity="center"
             android:text="@string/notifications_empty_description"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="@color/connexa_on_surface_variant" />
+            android:textColor="?attr/colorOnSurfaceVariant" />
     </LinearLayout>
 
     <LinearLayout
@@ -100,10 +113,10 @@
         android:orientation="vertical"
         android:padding="24dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/notification_list"
-        app:layout_constraintEnd_toEndOf="@id/notification_list"
-        app:layout_constraintStart_toStartOf="@id/notification_list"
-        app:layout_constraintTop_toTopOf="@id/notification_list">
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/notification_toolbar">
 
         <TextView
             android:id="@+id/notification_error_message"
@@ -111,7 +124,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="@color/connexa_error" />
+            android:textColor="?attr/colorError" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/notification_retry_action"
@@ -120,5 +133,6 @@
             android:layout_marginTop="12dp"
             android:text="@string/notifications_retry" />
     </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

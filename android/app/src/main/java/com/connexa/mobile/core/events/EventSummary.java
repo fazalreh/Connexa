@@ -20,6 +20,7 @@ public final class EventSummary {
     private final String category;
     private final String organizerName;
     private final String status;
+    private final String coverImageUrl;
     private final long revision;
     private final Instant createdAt;
     private final Instant updatedAt;
@@ -38,6 +39,30 @@ public final class EventSummary {
             long revision,
             Instant createdAt,
             Instant updatedAt) {
+        this(id, title, summary, startsAt, endsAt, timeZone, venueName, category,
+                organizerName, status, revision, createdAt, updatedAt, null);
+    }
+
+    /**
+     * @param coverImageUrl null for the great majority of events. One arriving from an
+     *     announcement email carries no artwork, and the feed draws a generated banner in
+     *     its place rather than a gap.
+     */
+    public EventSummary(
+            UUID id,
+            String title,
+            String summary,
+            Instant startsAt,
+            Instant endsAt,
+            String timeZone,
+            String venueName,
+            String category,
+            String organizerName,
+            String status,
+            long revision,
+            Instant createdAt,
+            Instant updatedAt,
+            String coverImageUrl) {
         this.id = Objects.requireNonNull(id, "id is required");
         this.title = requireText(title, "title");
         this.summary = requireText(summary, "summary");
@@ -58,6 +83,10 @@ public final class EventSummary {
         this.revision = revision;
         this.createdAt = Objects.requireNonNull(createdAt, "createdAt is required");
         this.updatedAt = Objects.requireNonNull(updatedAt, "updatedAt is required");
+        // Blank and absent mean the same thing, so readers have one case rather than two.
+        this.coverImageUrl = coverImageUrl == null || coverImageUrl.trim().isEmpty()
+                ? null
+                : coverImageUrl.trim();
         if (updatedAt.isBefore(createdAt)) {
             throw new IllegalArgumentException("updatedAt cannot be before createdAt");
         }
@@ -97,6 +126,11 @@ public final class EventSummary {
 
     public String getOrganizerName() {
         return organizerName;
+    }
+
+    /** @return the cover address, or null when the event has none */
+    public String getCoverImageUrl() {
+        return coverImageUrl;
     }
 
     public String getStatus() {

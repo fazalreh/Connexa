@@ -1,5 +1,6 @@
 package com.connexa.mobile.core.network;
 
+import com.connexa.mobile.core.auth.IdentityTokenProvider;
 import com.connexa.mobile.core.events.EventDataSource;
 import com.connexa.mobile.core.events.EventPage;
 import com.connexa.mobile.core.events.EventSummary;
@@ -48,12 +49,116 @@ public final class EventApiClient implements EventDataSource {
         return parsePage(requestJson(endpointResolver.events(query, page, size)));
     }
 
+    /**
+     * Meaning-based search.
+     *
+     * <p>Falls back to keyword listing when the semantic index has nothing to offer, so a
+     * deployment without an embedding provider still returns results rather than an empty
+     * screen. The two are indistinguishable to the caller, which is the point.
+     */
+    public EventPage searchEvents(String phrase, int limit) throws IOException {
+        String trimmed = phrase == null ? "" : phrase.trim();
+        if (trimmed.length() < 2) {
+            return listPublishedEvents(trimmed, 0, limit);
+        }
+        JSONArray results;
+        try {
+            results = requestJsonArray(endpointResolver.searchEvents(trimmed, limit));
+        } catch (IOException unavailable) {
+            return listPublishedEvents(trimmed, 0, limit);
+        }
+        List<EventSummary> events = new ArrayList<>(results.length());
+        for (int index = 0; index < results.length(); index++) {
+            JSONObject scored = results.optJSONObject(index);
+            if (scored == null) {
+                continue;
+            }
+            JSONObject event = scored.optJSONObject("event");
+            if (event != null) {
+                events.add(parseEvent(event));
+            }
+        }
+        if (events.isEmpty()) {
+            return listPublishedEvents(trimmed, 0, limit);
+        }
+        return new EventPage(events, 0, limit, events.size());
+    }
+
+    /**
+     * Suggestions for the signed-in attendee.
+     *
+     * <p>Returns an empty list rather than throwing when there is no session or no history:
+     * a personalised row that cannot be filled should simply not appear, not surface an
+     * error on a screen the user did not ask it about.
+     */
+    public List<EventSummary> recommendationsFor(int limit, IdentityTokenProvider tokenProvider) {
+        try {
+            JSONArray results = requestAuthorisedArray(
+                    endpointResolver.recommendations(limit), tokenProvider);
+            List<EventSummary> events = new ArrayList<>(results.length());
+            for (int index = 0; index < results.length(); index++) {
+                JSONObject scored = results.optJSONObject(index);
+                JSONObject event = scored == null ? null : scored.optJSONObject("event");
+                if (event != null) {
+                    events.add(parseEvent(event));
+                }
+            }
+            return events;
+        } catch (IOException | RuntimeException unavailable) {
+            return List.of();
+        }
+    }
+
+    private JSONArray requestAuthorisedArray(URI endpoint, IdentityTokenProvider tokenProvider)
+            throws IOException {
+        URLConnection raw = endpoint.toURL().openConnection();
+        if (!(raw instanceof HttpURLConnection connection)) {
+            throw new IOException("The event service endpoint is not HTTP.");
+        }
+        try {
+            connection.setConnectTimeout(CONNECT_TIMEOUT_MILLIS);
+            connection.setReadTimeout(READ_TIMEOUT_MILLIS);
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setRequestProperty(
+                    "Authorization", "Bearer " + tokenProvider.currentBearerToken());
+            int status = connection.getResponseCode();
+            if (status / 100 != 2) {
+                throw new IOException("Recommendations are unavailable (" + status + ").");
+            }
+            try {
+                return new JSONArray(readBody(connection.getInputStream()));
+            } catch (JSONException malformed) {
+                throw new IOException("Unreadable response.", malformed);
+            }
+        } finally {
+            connection.disconnect();
+        }
+    }
+
     @Override
     public EventSummary getEvent(UUID eventId) throws IOException {
         return parseEvent(requestJson(endpointResolver.event(eventId)));
     }
 
+    /** Same transport as {@link #requestJson}, for endpoints that return a bare array. */
+    private JSONArray requestJsonArray(URI endpoint) throws IOException {
+        try {
+            return new JSONArray(requestBody(endpoint));
+        } catch (JSONException exception) {
+            throw new IOException("The event service returned an unreadable response.", exception);
+        }
+    }
+
     private JSONObject requestJson(URI endpoint) throws IOException {
+        try {
+            return new JSONObject(requestBody(endpoint));
+        } catch (JSONException exception) {
+            throw new IOException("The event service returned an unreadable response.", exception);
+        }
+    }
+
+    private String requestBody(URI endpoint) throws IOException {
         URLConnection rawConnection = endpoint.toURL().openConnection();
         if (!(rawConnection instanceof HttpURLConnection)) {
             throw new IOException("The event service endpoint is not HTTP.");
@@ -75,11 +180,7 @@ public final class EventApiClient implements EventDataSource {
             if (statusCode < 200 || statusCode >= 300) {
                 throw new EventApiException(statusCode, publicMessage(statusCode));
             }
-            try {
-                return new JSONObject(body);
-            } catch (JSONException exception) {
-                throw new IOException("The event service returned an unreadable response.", exception);
-            }
+            return body;
         } finally {
             connection.disconnect();
         }
@@ -126,7 +227,8 @@ public final class EventApiClient implements EventDataSource {
                     requireText(source, "status"),
                     requireNonNegativeLong(source, "revision"),
                     Instant.parse(requireText(source, "createdAt")),
-                    Instant.parse(requireText(source, "updatedAt")));
+                    Instant.parse(requireText(source, "updatedAt")),
+                    source.isNull("coverImageUrl") ? null : source.optString("coverImageUrl", null));
         } catch (IllegalArgumentException exception) {
             throw new IOException("The event service returned an invalid event.", exception);
         }
