@@ -27,6 +27,11 @@ class PlatformStatusControllerTest {
                 .andExpect(jsonPath("$.service").value("connexa-api"))
                 .andExpect(jsonPath("$.status").value("available"))
                 .andExpect(jsonPath("$.requestId").value("connexa-foundation-001"))
-                .andExpect(jsonPath("$.disabledIntegrations[0]").value("firebase"));
+                // Tests run with every mode at its refusing default, so all four are reported
+                // disabled. The point of the assertion is that the list reflects the modes
+                // rather than a hard-coded constant.
+                .andExpect(jsonPath("$.disabledIntegrations").value(
+                        org.hamcrest.Matchers.hasItems(
+                                "identity", "assistant", "announcement-ingestion", "push")));
     }
 }

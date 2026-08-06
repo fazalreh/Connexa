@@ -1,6 +1,7 @@
 package com.connexa.api.api.v1;
 
 import com.connexa.api.config.ConnexaProperties;
+import com.connexa.api.config.IntegrationAvailability;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,9 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class PlatformStatusController {
 
     private final ConnexaProperties properties;
+    private final IntegrationAvailability availability;
 
-    public PlatformStatusController(ConnexaProperties properties) {
+    public PlatformStatusController(
+            ConnexaProperties properties, IntegrationAvailability availability) {
         this.properties = properties;
+        this.availability = availability;
     }
 
     @GetMapping("/status")
@@ -25,6 +29,6 @@ public class PlatformStatusController {
                 "available",
                 Instant.now(),
                 RequestIdFilter.current(request),
-                properties.integrations().disabledNames());
+                availability.disabledNames());
     }
 }
