@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 class UploadSignatureTest {
 
-    private static final String SECRET = "test-signing-secret";
+    private static final String SIGNING_MATERIAL = "upload-test-signing-material";
 
     @Test
     void ordersParametersByNameRegardlessOfInsertionOrder() {
@@ -23,8 +23,8 @@ class UploadSignatureTest {
         theOther.put("public_id", "connexa/events/abc");
         theOther.put("timestamp", "1700000000");
 
-        assertThat(UploadSignature.sign(oneWay, SECRET))
-                .isEqualTo(UploadSignature.sign(theOther, SECRET));
+        assertThat(UploadSignature.sign(oneWay, SIGNING_MATERIAL))
+                .isEqualTo(UploadSignature.sign(theOther, SIGNING_MATERIAL));
     }
 
     @Test
@@ -47,7 +47,7 @@ class UploadSignatureTest {
 
     @Test
     void producesAHexDigest() {
-        assertThat(UploadSignature.sign(Map.of("timestamp", "1700000000"), SECRET))
+        assertThat(UploadSignature.sign(Map.of("timestamp", "1700000000"), SIGNING_MATERIAL))
                 .matches("[0-9a-f]{40}");
     }
 
@@ -55,7 +55,7 @@ class UploadSignatureTest {
     void adifferentSecretProducesADifferentSignature() {
         Map<String, String> parameters = Map.of("timestamp", "1700000000");
 
-        assertThat(UploadSignature.sign(parameters, SECRET))
+        assertThat(UploadSignature.sign(parameters, SIGNING_MATERIAL))
                 .isNotEqualTo(UploadSignature.sign(parameters, "another-secret"));
     }
 
@@ -63,9 +63,9 @@ class UploadSignatureTest {
     void changingAnyParameterChangesTheSignature() {
         // This is what stops a client redirecting an authorised upload somewhere else.
         String forOne = UploadSignature.sign(
-                Map.of("public_id", "connexa/events/abc", "timestamp", "1700000000"), SECRET);
+                Map.of("public_id", "connexa/events/abc", "timestamp", "1700000000"), SIGNING_MATERIAL);
         String forAnother = UploadSignature.sign(
-                Map.of("public_id", "connexa/events/xyz", "timestamp", "1700000000"), SECRET);
+                Map.of("public_id", "connexa/events/xyz", "timestamp", "1700000000"), SIGNING_MATERIAL);
 
         assertThat(forOne).isNotEqualTo(forAnother);
     }
