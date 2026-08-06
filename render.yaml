@@ -1,0 +1,77 @@
+# Render Blueprint for the Connexa API.
+#
+# Every value that is a secret is declared with sync:false, which means Render prompts for it
+# once in the dashboard and never stores it in this file. Nothing here is committed with a
+# real value, so the blueprint is safe to keep in the repository.
+#
+# The database is not defined here: it already exists on Neon and is referenced by URL.
+
+services:
+  - type: web
+    name: connexa-api
+    runtime: docker
+    dockerfilePath: ./services/connexa-api/Dockerfile
+    dockerContext: ./services/connexa-api
+    plan: free
+    region: singapore          # Same region as the Neon database; a cross-region hop adds
+                               # latency to every query the API makes.
+    branch: main
+    healthCheckPath: /actuator/health
+    autoDeploy: true
+
+    envVars:
+      # --- non-secret configuration -------------------------------------------------
+      - key: CONNEXA_ENVIRONMENT
+        value: production
+      - key: CONNEXA_IDENTITY_MODE
+        value: firebase
+      - key: CONNEXA_PERSISTENCE_MODE
+        value: postgres
+      - key: CONNEXA_ASSISTANT_MODE
+        value: gemini
+      - key: CONNEXA_AI_PROVIDER
+        value: gemini
+      - key: CONNEXA_AI_MODEL
+        value: gemini-3.6-flash
+      - key: CONNEXA_AI_EMBEDDING_MODEL
+        value: gemini-embedding-001
+      # Migrations run on boot so a deploy and its schema move together. Flyway records what
+      # it has applied, so a restart that changes nothing is a no-op.
+      - key: CONNEXA_DB_MIGRATE
+        value: "true"
+      - key: CONNEXA_DB_HEALTH
+        value: "true"
+      # The free plan gives a small instance; a large pool would exhaust the database's
+      # connection limit long before it helped throughput.
+      - key: CONNEXA_DB_POOL_MAX
+        value: "5"
+
+      # --- secrets: entered once in the dashboard, never stored here -----------------
+      - key: CONNEXA_DB_URL
+        sync: false            # must end with ?sslmode=require for a managed provider
+      - key: CONNEXA_DB_USERNAME
+        sync: false
+      - key: CONNEXA_DB_PASSWORD
+        sync: false
+      - key: CONNEXA_AI_API_KEY
+        sync: false
+      - key: CONNEXA_FIREBASE_PROJECT_ID
+        sync: false
+      # A path, not the JSON itself: the identity configuration opens this as a file. Upload
+      # the document through Render's "Secret Files" (Environment tab), name it
+      # service-account.connexa.json, and it is mounted at the path below. Secret files are
+      # never written to the repository or the image.
+      - key: CONNEXA_FIREBASE_SERVICE_ACCOUNT_JSON
+        value: /etc/secrets/service-account.connexa.json
+      - key: CONNEXA_ORGANIZER_EMAILS
+        sync: false
+      - key: CONNEXA_CHECKIN_SECRET
+        sync: false
+      - key: CONNEXA_INGESTION_API_TOKEN
+        sync: false
+      - key: CONNEXA_CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CONNEXA_CLOUDINARY_API_KEY
+        sync: false
+      - key: CONNEXA_CLOUDINARY_API_SECRET
+        sync: false

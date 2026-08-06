@@ -32,6 +32,10 @@ spring:
     locations: classpath:db/migration
 
 server:
+  # A managed host assigns the port at run time and passes it in as PORT. Binding to
+  # anything else there means the platform's health check never reaches the process and
+  # the deployment is marked failed. Locally the variable is unset, so 8080 still applies.
+  port: ${PORT:8080}
   shutdown: graceful
 
 management:
