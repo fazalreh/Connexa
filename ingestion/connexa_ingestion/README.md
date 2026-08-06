@@ -41,5 +41,9 @@ From the Connexa repository root:
 
 ```powershell
 $env:PYTHONPATH = "$PWD\ingestion"
-python -m unittest discover -s ingestion/connexa_ingestion/tests -v
+python -m unittest discover -s ingestion/connexa_ingestion/tests -t ingestion -v
 ```
+
+`-t ingestion` sets the discovery top-level directory to the package root. Without
+it, the test modules are imported outside the package, their relative imports
+fail, and the run silently covers only part of the suite.
