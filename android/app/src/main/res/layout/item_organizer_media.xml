@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginVertical="4dp"
-    app:cardBackgroundColor="@color/connexa_surface_container"
+    app:cardBackgroundColor="?attr/colorSurfaceContainer"
     app:cardCornerRadius="12dp"
     app:cardElevation="0dp">
 
@@ -28,7 +28,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-                android:textColor="@color/connexa_on_surface" />
+                android:textColor="?attr/colorOnSurface" />
 
             <TextView
                 android:id="@+id/organizer_media_metadata"
@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-                android:textColor="@color/connexa_on_surface_variant" />
+                android:textColor="?attr/colorOnSurfaceVariant" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton

@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.format.DateFormat;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -14,6 +16,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.connexa.mobile.R;
 import com.connexa.mobile.core.organizer.OrganizerDraftField;
+import com.connexa.mobile.BuildConfig;
+import com.connexa.mobile.core.auth.ConnexaIdentity;
+import com.connexa.mobile.core.network.ApiEndpointResolver;
+import com.connexa.mobile.core.organizer.OrganizerApiClient;
+import com.connexa.mobile.core.organizer.OrganizerApiException;
 import com.connexa.mobile.core.organizer.OrganizerEventDraft;
 import com.connexa.mobile.databinding.OrganizerEventEditorBinding;
 import com.google.android.material.snackbar.Snackbar;
@@ -22,6 +29,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
@@ -40,6 +49,9 @@ public final class OrganizerEventEditorActivity extends AppCompatActivity {
 
     private OrganizerEventEditorBinding binding;
     private OrganizerMediaSelectionAdapter mediaAdapter;
+    private OrganizerApiClient organizerApiClient;
+    private ExecutorService backgroundExecutor;
+    private Handler mainThreadHandler;
     private ActivityResultLauncher<String> mediaPicker;
     private Instant startsAt;
     private Instant endsAt;
@@ -67,12 +79,62 @@ public final class OrganizerEventEditorActivity extends AppCompatActivity {
         binding.organizerAddMediaButton.setOnClickListener(view -> mediaPicker.launch("image/*"));
         binding.organizerSaveEventButton.setOnClickListener(view -> validateDraft());
         mediaAdapter.submit(selectedMedia);
+
+        organizerApiClient = new OrganizerApiClient(
+                new ApiEndpointResolver(BuildConfig.API_BASE_URL),
+                ConnexaIdentity.tokenProvider(this));
+        backgroundExecutor = Executors.newSingleThreadExecutor();
+        mainThreadHandler = new Handler(Looper.getMainLooper());
     }
 
     @Override
     protected void onDestroy() {
+        if (backgroundExecutor != null) {
+            backgroundExecutor.shutdownNow();
+            backgroundExecutor = null;
+        }
+        mainThreadHandler = null;
         binding = null;
         super.onDestroy();
+    }
+
+    /**
+     * Publishes the validated draft.
+     *
+     * <p>Callbacks re-check {@code binding} because the screen can be destroyed while the
+     * request is still in flight.
+     */
+    private void publish(OrganizerEventDraft draft) {
+        binding.organizerSaveEventButton.setEnabled(false);
+        Snackbar.make(binding.getRoot(), R.string.organizer_publishing, Snackbar.LENGTH_SHORT).show();
+        backgroundExecutor.execute(() -> {
+            try {
+                organizerApiClient.createAndPublish(draft);
+                postToMain(() -> {
+                    Snackbar.make(binding.getRoot(), R.string.organizer_published,
+                            Snackbar.LENGTH_LONG).show();
+                    binding.organizerSaveEventButton.setEnabled(true);
+                    finish();
+                });
+            } catch (OrganizerApiException failure) {
+                String message = failure.getMessage();
+                postToMain(() -> {
+                    binding.organizerSaveEventButton.setEnabled(true);
+                    Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
+                });
+            }
+        });
+    }
+
+    private void postToMain(Runnable action) {
+        Handler handler = mainThreadHandler;
+        if (handler != null) {
+            handler.post(() -> {
+                if (binding != null) {
+                    action.run();
+                }
+            });
+        }
     }
 
     private void chooseDateTime(boolean choosingStart) {
@@ -129,10 +191,7 @@ public final class OrganizerEventEditorActivity extends AppCompatActivity {
             return;
         }
 
-        Snackbar.make(
-                binding.getRoot(),
-                R.string.organizer_access_unavailable,
-                Snackbar.LENGTH_LONG).show();
+        publish(draft);
     }
 
     private void renderValidation(OrganizerEventDraftFormViewModel form) {

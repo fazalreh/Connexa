@@ -5,6 +5,7 @@ import com.connexa.api.domain.organizer.OrganizerEventDraft;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -37,5 +38,13 @@ public class InMemoryOrganizerEventDraftStore implements OrganizerEventDraftStor
                 .filter(draft -> owner.equals(draft.owner()))
                 .sorted(Comparator.comparing(OrganizerEventDraft::updatedAt).reversed())
                 .toList();
+    }
+
+    @Override
+    public Optional<OrganizerEventDraft> findByIdAndOwner(UUID draftId, IdentityKey owner) {
+        Objects.requireNonNull(draftId, "draftId is required");
+        Objects.requireNonNull(owner, "owner is required");
+        return Optional.ofNullable(drafts.get(draftId))
+                .filter(draft -> owner.equals(draft.owner()));
     }
 }

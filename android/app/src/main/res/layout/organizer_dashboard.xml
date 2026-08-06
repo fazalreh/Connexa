@@ -3,19 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/connexa_surface">
+    android:fitsSystemWindows="true"
+    android:background="?attr/colorSurface">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/organizer_dashboard_toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/connexa_primary"
+        android:background="?attr/colorSurfaceContainer"
         android:navigationContentDescription="@string/go_back"
-        android:theme="@style/ThemeOverlay.Connexa.Toolbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@android:drawable/ic_media_previous"
+        app:navigationIcon="@drawable/ic_arrow_back"
         app:title="@string/organizer_dashboard_title" />
 
     <ScrollView
@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/organizer_dashboard_heading"
                 android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
-                android:textColor="@color/connexa_on_surface" />
+                android:textColor="?attr/colorOnSurface" />
 
             <TextView
                 android:id="@+id/organizer_dashboard_summary"
@@ -50,7 +50,7 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/organizer_dashboard_summary"
                 android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-                android:textColor="@color/connexa_on_surface_variant" />
+                android:textColor="?attr/colorOnSurfaceVariant" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/organizer_create_event_button"
@@ -64,7 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                app:cardBackgroundColor="@color/connexa_surface_container"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp">
 
@@ -85,7 +85,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/organizer_registrations"
                             android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
-                            android:textColor="@color/connexa_on_surface_variant" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
 
                         <TextView
                             android:id="@+id/organizer_total_registrations"
@@ -93,7 +93,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
-                            android:textColor="@color/connexa_on_surface" />
+                            android:textColor="?attr/colorOnSurface" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -107,7 +107,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/organizer_check_ins"
                             android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
-                            android:textColor="@color/connexa_on_surface_variant" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
 
                         <TextView
                             android:id="@+id/organizer_total_check_ins"
@@ -115,7 +115,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
-                            android:textColor="@color/connexa_on_surface" />
+                            android:textColor="?attr/colorOnSurface" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -129,7 +129,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/organizer_drafts"
                             android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
-                            android:textColor="@color/connexa_on_surface_variant" />
+                            android:textColor="?attr/colorOnSurfaceVariant" />
 
                         <TextView
                             android:id="@+id/organizer_draft_count"
@@ -137,7 +137,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
-                            android:textColor="@color/connexa_on_surface" />
+                            android:textColor="?attr/colorOnSurface" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -155,7 +155,7 @@
                     android:layout_weight="1"
                     android:text="@string/organizer_managed_events"
                     android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                    android:textColor="@color/connexa_on_surface" />
+                    android:textColor="?attr/colorOnSurface" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/organizer_refresh_button"
@@ -188,7 +188,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/organizer_empty_title"
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                    android:textColor="@color/connexa_on_surface" />
+                    android:textColor="?attr/colorOnSurface" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -197,7 +197,7 @@
                     android:gravity="center"
                     android:text="@string/organizer_empty_description"
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                    android:textColor="@color/connexa_on_surface_variant" />
+                    android:textColor="?attr/colorOnSurfaceVariant" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

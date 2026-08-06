@@ -3,19 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/connexa_surface">
+    android:fitsSystemWindows="true"
+    android:background="?attr/colorSurface">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/organizer_event_analytics_toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/connexa_primary"
+        android:background="?attr/colorSurfaceContainer"
         android:navigationContentDescription="@string/go_back"
-        android:theme="@style/ThemeOverlay.Connexa.Toolbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@android:drawable/ic_media_previous"
+        app:navigationIcon="@drawable/ic_arrow_back"
         app:title="@string/organizer_analytics_title" />
 
     <ScrollView
@@ -39,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
-                android:textColor="@color/connexa_on_surface" />
+                android:textColor="?attr/colorOnSurface" />
 
             <TextView
                 android:id="@+id/organizer_analytics_last_updated"
@@ -47,13 +47,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                android:textColor="@color/connexa_on_surface_variant" />
+                android:textColor="?attr/colorOnSurfaceVariant" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                app:cardBackgroundColor="@color/connexa_surface_container"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp">
 
@@ -68,7 +68,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/organizer_registration_progress"
                         android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                        android:textColor="@color/connexa_on_surface" />
+                        android:textColor="?attr/colorOnSurface" />
 
                     <TextView
                         android:id="@+id/organizer_analytics_registration_value"
@@ -76,7 +76,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
-                        android:textColor="@color/connexa_on_surface" />
+                        android:textColor="?attr/colorOnSurface" />
 
                     <com.google.android.material.progressindicator.LinearProgressIndicator
                         android:id="@+id/organizer_analytics_registration_progress"
@@ -116,7 +116,7 @@
                 android:layout_marginTop="28dp"
                 android:text="@string/organizer_attendance_activity"
                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                android:textColor="@color/connexa_on_surface" />
+                android:textColor="?attr/colorOnSurface" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/organizer_analytics_activity_list"
