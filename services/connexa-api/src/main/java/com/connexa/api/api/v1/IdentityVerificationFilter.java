@@ -60,7 +60,11 @@ public final class IdentityVerificationFilter extends OncePerRequestFilter {
         }
         if (path.startsWith("/api/v1/assistant/")
                 || path.startsWith("/api/v1/organizer/")
-                || path.startsWith("/api/v1/notifications")) {
+                || path.startsWith("/api/v1/notifications")
+                // Index rebuilding spends provider quota, so it is never anonymous.
+                // Listed explicitly rather than relying on the controller to reject a
+                // request with no identity attached.
+                || path.startsWith("/api/v1/search/")) {
             return true;
         }
         if (!path.startsWith("/api/v1/events")) {
@@ -69,13 +73,33 @@ public final class IdentityVerificationFilter extends OncePerRequestFilter {
         return !("GET".equalsIgnoreCase(method) && isPublicEventRead(path));
     }
 
+    /**
+     * The catalogue: the listing, one event, and how many seats it has left.
+     *
+     * <p>Seat availability is public for the same reason the event itself is — it is the
+     * number a poster carries, and hiding it left a browsing visitor unable to tell a full
+     * event from an open one, which is what decides whether they sign up at all.
+     *
+     * <p>What stays closed is anything naming a person: an individual's RSVP, their place in
+     * a queue, their saved events. The count is about the event; those are about someone.
+     * The live stream is closed too, being a connection an anonymous caller could hold open
+     * without limit.
+     */
     private static boolean isPublicEventRead(String path) {
         if (path.equals("/api/v1/events")) {
             return true;
         }
         String prefix = "/api/v1/events/";
-        return path.startsWith(prefix)
-                && path.substring(prefix.length()).indexOf('/') < 0;
+        if (!path.startsWith(prefix)) {
+            return false;
+        }
+        String afterEventId = path.substring(prefix.length());
+        int separator = afterEventId.indexOf('/');
+        if (separator < 0) {
+            return true;
+        }
+        // Exactly one segment, matched whole: "capacity" is public, "capacity/stream" is not.
+        return afterEventId.substring(separator + 1).equals("capacity");
     }
 
     private static String pathWithinApplication(HttpServletRequest request) {
