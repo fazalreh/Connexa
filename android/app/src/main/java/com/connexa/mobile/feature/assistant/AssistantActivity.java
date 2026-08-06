@@ -12,9 +12,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.connexa.mobile.core.assistant.AssistantConversation;
 import com.connexa.mobile.BuildConfig;
 import com.connexa.mobile.core.assistant.AssistantApiClient;
-import com.connexa.mobile.core.auth.UnavailableIdentityTokenProvider;
+import com.connexa.mobile.core.auth.ConnexaIdentity;
 import com.connexa.mobile.core.network.ApiEndpointResolver;
 import com.connexa.mobile.databinding.AssistantScreenBinding;
+import com.connexa.mobile.feature.navigation.ConnexaBottomNavigation;
 import com.connexa.mobile.feature.events.EventDetailsActivity;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -43,6 +44,7 @@ public final class AssistantActivity extends AppCompatActivity implements Assist
         super.onCreate(savedInstanceState);
         binding = AssistantScreenBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        ConnexaBottomNavigation.attach(this, binding.bottomNavigation.getRoot());
 
         messageAdapter = new AssistantMessageAdapter(reference -> startActivity(
                 EventDetailsActivity.newIntent(this, reference.getEventId())));
@@ -59,7 +61,7 @@ public final class AssistantActivity extends AppCompatActivity implements Assist
         presenter = new AssistantPresenter(
                 new AssistantApiClient(
                         new ApiEndpointResolver(BuildConfig.API_BASE_URL),
-                        new UnavailableIdentityTokenProvider()),
+                        ConnexaIdentity.tokenProvider(this)),
                 backgroundExecutor,
                 mainThreadExecutor,
                 this);

@@ -3,19 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/connexa_surface">
+    android:fitsSystemWindows="true"
+    android:background="?attr/colorSurface">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/assistant_toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/connexa_primary"
+        android:background="?attr/colorSurfaceContainer"
         android:navigationContentDescription="@string/go_back"
-        android:theme="@style/ThemeOverlay.Connexa.Toolbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@android:drawable/ic_media_previous"
+        app:navigationIcon="@drawable/ic_arrow_back"
         app:title="@string/assistant_title" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -55,7 +55,7 @@
             android:layout_marginStart="12dp"
             android:text="@string/assistant_loading"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="@color/connexa_on_surface_variant" />
+            android:textColor="?attr/colorOnSurfaceVariant" />
     </LinearLayout>
 
     <LinearLayout
@@ -77,21 +77,21 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="@color/connexa_error" />
+            android:textColor="?attr/colorError" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/assistant_composer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/connexa_surface"
+        android:background="?attr/colorSurface"
         android:gravity="bottom"
         android:orientation="horizontal"
         android:paddingStart="16dp"
         android:paddingTop="8dp"
         android:paddingEnd="16dp"
         android:paddingBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -120,5 +120,18 @@
             android:layout_marginStart="12dp"
             android:text="@string/assistant_send" />
     </LinearLayout>
+
+    <!--
+        Top-level navigation. Included rather than repeated so the bar cannot drift
+        out of step between the screens that show it.
+    -->
+    <include
+        android:id="@+id/bottom_navigation"
+        layout="@layout/view_bottom_navigation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
