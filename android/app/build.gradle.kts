@@ -97,7 +97,7 @@ dependencies {
 
     // Draws the launch screen before any of our code runs, so the opening frame
     // costs nothing in startup time. Backports the platform behaviour below API 31.
-    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("androidx.core:core-splashscreen:1.2.0")
 
     // Door check-in. The core library is plain Java and does the encoding, so the code that
     // turns a pass into a matrix is unit tested; the embedded scanner supplies the camera
