@@ -108,7 +108,7 @@ dependencies {
     // Cover images. Loading pictures into a recycling list is deceptively hard - the
     // cancellation, downsampling and cache behaviour are the whole problem, and getting
     // them wrong shows up as the wrong image on the wrong row while scrolling.
-    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.github.bumptech.glide:glide:5.0.9")
 
     // Identity only. The app obtains short-lived tokens at runtime and never holds a
     // privileged credential; every authorization decision stays on the server.
