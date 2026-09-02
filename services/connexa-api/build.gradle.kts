@@ -46,7 +46,7 @@ dependencies {
     // real server. This runs an actual PostgreSQL binary as the current user, so the
     // integration suite needs neither Docker nor root.
     testImplementation("io.zonky.test:embedded-postgres:2.2.2")
-    testImplementation(platform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.10.0"))
+    testImplementation(platform("io.zonky.test.postgres:embedded-postgres-binaries-bom:18.6.0"))
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
