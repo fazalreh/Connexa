@@ -26,7 +26,7 @@ dependencies {
     // the default in-memory mode leaves the pool untouched and never opens a connection.
     // Server-side identity verification. Tokens are validated against the provider here;
     // the Android client never asserts its own claims.
-    implementation("com.google.firebase:firebase-admin:9.10.0")
+    implementation("com.google.firebase:firebase-admin:9.11.0")
 
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     // Must be the starter, not bare flyway-core. Spring Boot 4 split autoconfiguration into
